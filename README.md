@@ -1,0 +1,58 @@
+Python OPTIMaDe Candidate Reference Implementation
+==================================================
+
+*Disclaimer: this code has not yet been throughly tested and should be
+considered alpha quality. While this implementation has been
+created in the hope that it could, eventually, become a reference
+implementation of the OPTIMaDe API, at this point it does NOT
+have any official endorsment by OPTIMaDe.*
+
+Furthermore, the 'API' that is formed by the routines unde `src/`
+should in no sense at this point be considered stable.
+
+This software will for the moment use version numbers
+that start with the OPTIMaDe specification it implements, and then
+append a version number to that. E.g., v0.9.5.1 for 
+implementing v0.9.5 of the OPTIMaDe specification.
+
+Download:
+```
+git clone https://github.com/Materials-Consortia/python-optimade-candidate-reference-implementation.git
+```
+
+To do some simple tests, run:
+```
+./start_simple_test.py
+```
+To just try a manual filter-type query using the example\_sqlite3 backend. This script also takes (the expression part of) an OPTIMaDe filter string as argument, so you can do, e.g.:
+```
+./start_simple_test.py 'id="st-6"'
+```
+
+To run everything in full 'server' mode:
+```
+./start_serve_example_sqlite3.py
+```
+Then go to `http://localhost:8080/info` in your browser, and you should
+see the OPTIMaDe API being served here.
+
+There are some other examples of using parts of the provided
+routines in the directory `examples/`.
+
+
+Notes: 
+
+- The parser of OPTIMaDe filter strings is relatively well-tested. 
+  However, the parser output is then re-translated into a simpler 
+  abstract syntax tree in src/parser/parse_optimade_filter.py
+  That routine has not yet undergone heavy testing for all possible
+  outcomes of the grammar, so it is possible that this function
+  gets surprised by valid output of the parser and crashes.
+   
+- There are some unittests under `tests/`, they can be started with
+  ```
+  make tests
+  ```
+  (Look in the `Makefile` for more details.)
+
+
