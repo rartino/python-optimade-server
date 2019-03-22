@@ -62,7 +62,7 @@ entry_info = {
     }
 }
 
-all_entries = entry_info.keys()
+all_entries = list(entry_info.keys())
 
 properties_by_entry = dict([(x, entry_info[x]['properties']) for x in entry_info])
 
