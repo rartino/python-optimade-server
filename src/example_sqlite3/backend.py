@@ -27,9 +27,6 @@
 
 from __future__ import print_function
 
-import os, sys
-from pprint import pprint
-
 from example_sqlite3 import database
 from translate import optimade_filter_to_sql, string_handler, integer_handler, elements_handler, chemical_formula_handler
 

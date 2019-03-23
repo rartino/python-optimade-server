@@ -24,11 +24,15 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import print_function
+import cgitb, sys,codecs
 
-
-import shutil, os, cgitb, sys
-from urllib.parse import parse_qsl, urlparse
-from http.server import BaseHTTPRequestHandler, HTTPServer
+try:
+    from urllib.parse import parse_qsl, urlparse
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+except ImportError:
+    from urlparse import parse_qsl, urlparse
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
 class WebError(Exception):
@@ -66,7 +70,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         return debug_info
 
     def wfile_write_encoded(self, s):
-        self.wfile.write(bytes(s, 'utf-8'))
+        self.wfile.write(codecs.encode(s, 'utf-8'))
 
     def do_GET(self):
         parsed_path = urlparse(self.path)
@@ -159,7 +163,7 @@ def startup(get_callback, post_callback=None, port=80, baseurl=None, debug=False
     server = None
     try:
         server = HTTPServer(('', port), _CallbackRequestHandler)
-        print('Started httk webserver on port ', port)
+        print('Started httk webserver on port:',port)
         server.serve_forever()
 
     except KeyboardInterrupt:

@@ -28,7 +28,7 @@
 import os, re
 from pprint import pprint
 
-from . miniparser import parser, build_ls, LogVerbosity
+from .miniparser import parser, build_ls, LogVerbosity
 
 ls = None
 

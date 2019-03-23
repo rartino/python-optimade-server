@@ -25,6 +25,6 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from src.webserver.serve import *
-from src.webserver.jsonapi import *
+from .serve import *
+from .jsonapi import *
 

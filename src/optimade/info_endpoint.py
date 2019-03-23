@@ -25,7 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from optimade.entries import entry_info, all_entries
+from .entries import entry_info, all_entries
 
 
 def generate_info_endpoint_reply(baseurl):

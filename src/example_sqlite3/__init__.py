@@ -25,4 +25,4 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from example_sqlite3.backend import *
+from .backend import *
