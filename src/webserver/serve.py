@@ -25,7 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import print_function
-import cgitb, sys
+import cgitb, sys, codecs
 
 try:
     from urllib.parse import parse_qsl, urlparse
@@ -69,6 +69,9 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         }
         return debug_info
 
+    def wfile_write_encoded(self, s):
+        self.wfile.write(codecs.encode(s, 'utf-8'))
+
     def do_GET(self):
         parsed_path = urlparse(self.path)
 
@@ -84,22 +87,22 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['mimetype'])
             self.end_headers()
-            self.wfile.write(output['content'])
+            self.wfile_write_encoded(output['content'])
 
         except WebError as e:
             self.send_response(e.response_code)
             self.send_header('Content-type', e.mimetype)
             self.end_headers()
-            self.wfile.write(e.content)
+            self.wfile_write_encoded(e.content)
 
         except Exception as e:
             self.send_response(500)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             if self.debug:
-                self.wfile.write(cgitb.html(sys.exc_info()))
+                self.wfile_write_encoded(cgitb.html(sys.exc_info()))
             else:
-                self.wfile.write("<html><body>An unexpected server error has occured.</body></html>")
+                self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
     def do_POST(self):
         ctype, pdict = parse_header(self.headers['content-type'])
@@ -111,7 +114,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         else:
             postvars = {}
 
-        parsed_path = urlparse.urlparse(self.path)
+        parsed_path = urlparse(self.path)
 
         relpath = parsed_path.path
 
@@ -124,22 +127,22 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['mimetype'])
             self.end_headers()
-            self.wfile.write(output['content'])
+            self.wfile_write_encoded(output['content'])
 
         except WebError as e:
             self.send_response(e.response_code)
             self.send_header('Content-type', e.mimetype)
             self.end_headers()
-            self.wfile.write(e.content)
+            self.wfile_write_encoded(e.content)
 
         except Exception as e:
             self.send_response(500)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             if self.debug:
-                self.wfile.write(cgitb.html(sys.exc_info()))
+                self.wfile_write_encoded(cgitb.html(sys.exc_info()))
             else:
-                self.wfile.write("<html><body>An unexpected server error has occured.</body></html>")
+                self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
 
 def startup(get_callback, post_callback=None, port=80, baseurl=None, debug=False):
