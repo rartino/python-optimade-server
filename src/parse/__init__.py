@@ -25,5 +25,5 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from parse.parse_optimade_filter import *
-from parse.miniparser import *
+from .parse_optimade_filter import *
+from .miniparser import *

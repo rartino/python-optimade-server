@@ -25,8 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from serve import WebError
-
+from .serve import WebError
 
 def check_jsonapi_header_requirements(headers):
     # Handle jsonapi MUSTs with regards to headers

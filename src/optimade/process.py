@@ -26,11 +26,12 @@
 # SOFTWARE.
 
 from pprint import pprint
-from optimade.entries import all_entries, valid_response_fields
-from optimade.validate import validate
-from optimade.info_endpoint import generate_info_endpoint_reply, generate_entry_info_endpoint_reply, generate_base_endpoint_reply
-from optimade.entry_endpoint import generate_entry_endpoint_reply
-from optimade.error import OptimadeError
+
+from .entries import all_entries, valid_response_fields
+from .validate import validate
+from .info_endpoint import generate_info_endpoint_reply, generate_entry_info_endpoint_reply, generate_base_endpoint_reply
+from .entry_endpoint import generate_entry_endpoint_reply
+from .error import OptimadeError
 from parse import ParserSyntaxError, parse_optimade_filter
 
 

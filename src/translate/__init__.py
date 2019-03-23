@@ -25,4 +25,4 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from optimade_filter_to_sql import *
+from .optimade_filter_to_sql import *

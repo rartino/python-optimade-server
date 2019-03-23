@@ -25,6 +25,6 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from serve import *
-from jsonapi import *
+from .serve import *
+from .jsonapi import *
 

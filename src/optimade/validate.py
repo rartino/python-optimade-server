@@ -25,8 +25,8 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from optimade.entries import all_entries, valid_endpoints, valid_response_fields
-from optimade.error import OptimadeError
+from .entries import all_entries, valid_endpoints, valid_response_fields
+from .error import OptimadeError
 
 
 def validate(relurl, query):

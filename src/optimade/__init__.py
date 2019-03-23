@@ -25,7 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from info_endpoint import *
-from entry_endpoint import *
-from validate import *
-from process import *
+from .info_endpoint import *
+from .entry_endpoint import *
+from .validate import *
+from .process import *

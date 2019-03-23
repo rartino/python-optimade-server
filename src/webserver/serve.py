@@ -24,14 +24,14 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-import shutil, os, urlparse, cgitb, sys
+from __future__ import print_function
+import cgitb, sys
 
 try:
-    from urllib.parse import parse_qsl
+    from urllib.parse import parse_qsl, urlparse
     from http.server import BaseHTTPRequestHandler, HTTPServer
 except ImportError:
-    from urlparse import parse_qsl
+    from urlparse import parse_qsl, urlparse
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
@@ -70,7 +70,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         return debug_info
 
     def do_GET(self):
-        parsed_path = urlparse.urlparse(self.path)
+        parsed_path = urlparse(self.path)
 
         relpath = parsed_path.path
         query = dict(parse_qsl(parsed_path.query, keep_blank_values=True))
@@ -160,14 +160,14 @@ def startup(get_callback, post_callback=None, port=80, baseurl=None, debug=False
     server = None
     try:
         server = HTTPServer(('', port), _CallbackRequestHandler)
-        print 'Started httk webserver on port ', port
+        print('Started httk webserver on port:',port)
         server.serve_forever()
 
     except KeyboardInterrupt:
-        print 'Received keyboard interrupt, shutting down the httk web server'
+        print('Received keyboard interrupt, shutting down the httk web server')
 
     finally:
         if server is not None:
             server.socket.close()
-            print 'Server shutdown complete.'
+            print('Server shutdown complete.')
 
