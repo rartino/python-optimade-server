@@ -37,6 +37,7 @@ def parse_optimade_filter(filter_string, verbosity=0):
     # To get diagnostic output, pass argument, e.g.,: verbosity=LogVerbosity(0,parser_verbosity=5))
 
     parse_tree = parse_optimade_filter_raw(filter_string, verbosity=verbosity)
+
     ast = simplify_optimade_filter_ast(parse_tree)
     return ast
 

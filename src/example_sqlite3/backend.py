@@ -120,12 +120,12 @@ def _setup_test_data():
 
     calcs = [
         {'id': 'calc-1', 'local_id': 'calc-1', 'modification_date': '2019-03-21 23:45'},
-        {'id': 'calc-2', 'local_id': 'calc-1', 'modification_date': '2019-03-22 23:45'},
-        {'id': 'calc-3', 'local_id': 'calc-1', 'modification_date': '2019-03-23 23:45'},
-        {'id': 'calc-4', 'local_id': 'calc-1', 'modification_date': '2019-03-24 23:45'},
-        {'id': 'calc-5', 'local_id': 'calc-1', 'modification_date': '2019-03-25 23:45'},
-        {'id': 'calc-6', 'local_id': 'calc-1', 'modification_date': '2019-03-26 23:45'},
-        {'id': 'calc-7', 'local_id': 'calc-1', 'modification_date': '2019-03-27 23:45'}
+        {'id': 'calc-2', 'local_id': 'calc-2', 'modification_date': '2019-03-22 23:45'},
+        {'id': 'calc-3', 'local_id': 'calc-3', 'modification_date': '2019-03-23 23:45'},
+        {'id': 'calc-4', 'local_id': 'calc-4', 'modification_date': '2019-03-24 23:45'},
+        {'id': 'calc-5', 'local_id': 'calc-5', 'modification_date': '2019-03-25 23:45'},
+        {'id': 'calc-6', 'local_id': 'calc-6', 'modification_date': '2019-03-26 23:45'},
+        {'id': 'calc-7', 'local_id': 'calc-7', 'modification_date': '2019-03-27 23:45'}
     ]
 
     for calc in calcs:

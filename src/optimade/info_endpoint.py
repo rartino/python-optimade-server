@@ -26,23 +26,24 @@
 # SOFTWARE.
 
 from .entries import entry_info, all_entries
+from .versions import optimade_supported_versions
 
-
-def generate_info_endpoint_reply(baseurl):
+def generate_info_endpoint_reply(baseurl, version):
     """
     This just returns a hardcoded introspection string.
     """
-
+    available_api_versions = {}
+    for ver in optimade_supported_versions:
+        available_api_versions[optimade_supported_versions[ver]] = baseurl + ver
+    
     response = {    
         "data": [
             {
                 "type": "info",
                 "id": "/",
                 "attributes": {
-                    "api_version": "v0.9",
-                    "available_api_versions": {
-                        "0.9.5": baseurl+"v0.9/",
-                    },
+                    "api_version": 'v'+version,
+                    "available_api_versions": available_api_versions,
                     "formats": [
                         "json"
                     ],

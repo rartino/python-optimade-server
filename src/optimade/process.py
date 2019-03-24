@@ -54,7 +54,7 @@ def process(baseurl, relurl, query, query_function, debug=False):
         response = generate_base_endpoint_reply()
 
     elif endpoint == 'info':
-        response = generate_info_endpoint_reply(baseurl)
+        response = generate_info_endpoint_reply(baseurl, validated_parameters['version'])
 
     elif endpoint in all_entries or endpoint == 'all':
 
@@ -78,11 +78,11 @@ def process(baseurl, relurl, query, query_function, debug=False):
             input_string = validated_parameters['filter']
 
         if input_string is not None:
-            if filter_ast is not None:
+            if filter_ast is None:
                 try:
                     filter_ast = parse_optimade_filter(input_string)
                 except ParserSyntaxError as e:
-                    raise OptimadeError(str(e), 400)
+                    raise OptimadeError(str(e), 400, "Bad request")
 
             if debug:
                 print("==== FILTER STRING PARSE RESULT:")
@@ -107,9 +107,9 @@ def process(baseurl, relurl, query, query_function, debug=False):
         if base in all_entries:
             response = generate_entry_info_endpoint_reply(base)            
         else:
-            raise OptimadeError("Internal error: unexpected endpoint.", 400)
+            raise OptimadeError("Internal error: unexpected endpoint.", 500, "Internal server error")
 
     else:
-        raise OptimadeError("Internal error: unexpected endpoint.", 400)
+        raise OptimadeError("Internal error: unexpected endpoint.", 500, "Internal server error")
 
     return response

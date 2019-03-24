@@ -36,12 +36,12 @@ except ImportError:
 
 
 class WebError(Exception):
-    def __init__(self, msg, response_code, mimetype='text/plain', longmsg=None):        
-        super(WebError, self).__init__(msg)
-        self.msg = msg
-        self.content = longmsg if longmsg is not None else msg
+    def __init__(self, message, response_code, response_msg, longmsg=None, content_type='text/plain'):
+        super(WebError, self).__init__(message)
+        self.content = longmsg if longmsg is not None else message
         self.response_code = response_code
-        self.mimetype = mimetype
+        self.response_msg = response_msg
+        self.content_type = content_type
 
 
 class _CallbackRequestHandler(BaseHTTPRequestHandler):
@@ -85,13 +85,13 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             for callback in self.get_callbacks:
                 output = callback(relpath, query, self.headers)
             self.send_response(output['response_code'])
-            self.send_header('Content-type', output['mimetype'])
+            self.send_header('Content-type', output['content_type'])
             self.end_headers()
             self.wfile_write_encoded(output['content'])
 
         except WebError as e:
-            self.send_response(e.response_code)
-            self.send_header('Content-type', e.mimetype)
+            self.send_response(e.response_code, e.response_msg)
+            self.send_header('Content-type', e.content_type)
             self.end_headers()
             self.wfile_write_encoded(e.content)
 
@@ -125,13 +125,13 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             for callback in self.post_callbacks:
                 output = callback(relpath, query, self.headers)
             self.send_response(output['response_code'])
-            self.send_header('Content-type', output['mimetype'])
+            self.send_header('Content-type', output['content_type'])
             self.end_headers()
             self.wfile_write_encoded(output['content'])
 
         except WebError as e:
-            self.send_response(e.response_code)
-            self.send_header('Content-type', e.mimetype)
+            self.send_response(e.response_code, e.response_msg)
+            self.send_header('Content-type', e.content_type)
             self.end_headers()
             self.wfile_write_encoded(e.content)
 

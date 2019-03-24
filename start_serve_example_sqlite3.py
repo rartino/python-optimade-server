@@ -62,9 +62,9 @@ def request_callback(relurl, query, headers):
     try:
         response = optimade.process(baseurl, relurl, query, backend.execute_query, debug = True)
     except optimade.OptimadeError as e:
-        raise webserver.WebError("Could not process request: "+str(e),e.response_code)
+        raise webserver.WebError("Could not process request: "+str(e),e.response_code,e.response_msg)
     
-    return {'content': _json_format(response), 'mimetype':'application/vnd.api+json', 'response_code':200}
+    return {'content': _json_format(response), 'content_type':'application/vnd.api+json', 'response_code':200, 'response_msg':'OK'}
 
 
 if __name__ == "__main__":

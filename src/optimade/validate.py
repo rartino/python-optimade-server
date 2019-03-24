@@ -27,29 +27,43 @@
 
 from .entries import all_entries, valid_endpoints, valid_response_fields
 from .error import OptimadeError
-
+from .versions import optimade_supported_versions, optimade_default_version
 
 def validate(relurl, query):
     validated_parameters = {'response_limit': 50, 'endpoint': None, 'response_fields': []}
 
     if 'response_format' in query and 'response_format' != 'json':
-        raise OptimadeError("Requested response_format not supported.", 400)
+        raise OptimadeError("Requested response_format not supported.", 400, "Bad request")
 
     if 'response_limit' in query:
         try:
             validated_parameters['response_limit'] = int(query['response_limit'])
         except ValueError:
-            raise OptimadeError("Cannot interprete response_limit.", 400)
+            raise OptimadeError("Cannot interprete response_limit.", 400, "Bad request")
         if validated_parameters['response_limit'] > 50:
             validated_parameters['response_limit'] = 50
 
     endpoint = relurl.rstrip("/")
+
+    potential_optimade_version, _sep, rest = endpoint.partition('/')    
+    
+    if len(potential_optimade_version) > 2 and potential_optimade_version[0] == 'v' and potential_optimade_version[1] in "0123456789":
+        if potential_optimade_version in optimade_supported_versions:
+            validated_parameters['version'] = optimade_supported_versions[potential_optimade_version]
+            endpoint = rest
+        else:
+            raise OptimadeError("Unsupported version requested", 400, "Bad request")
+
+    if 'version' not in validated_parameters:
+        validated_parameters['version'] = optimade_default_version
+        
+        
     if endpoint in valid_endpoints:
         # Defensive programming; don't trust '=='/in to be byte-for-byte equivalent,
         # so don't use the insecure string from the user
         validated_parameters['endpoint'] = valid_endpoints[valid_endpoints.index(endpoint)]
     else:
-        endpoint, _sep, request_id = relurl.rpartition('/')
+        endpoint, _sep, request_id = endpoint.rpartition('/')
         if endpoint in valid_endpoints:
             # Defensive programming; don't trust '=='/in to be byte-for-byte equivalent,
             # so don't use the insecure string from the user
@@ -59,10 +73,10 @@ def validate(relurl, query):
             if all(ord(c) >= 32 and ord(c) <= 126 for c in request_id):
                 validated_parameters['request_id'] = request_id
             else:
-                raise OptimadeError("Unexpected characters in entry id.", 400)        
+                raise OptimadeError("Unexpected characters in entry id.", 400, "Bad request") 
 
     if validated_parameters['endpoint'] is None:
-        raise OptimadeError("Request for invalid endpoint.", 400)        
+        raise OptimadeError("Request for invalid endpoint.", 400, "Bad request")
 
     if 'response_fields' in query:
         response_fields = [x.strip() for x in query['response_fields'].split(",")]
