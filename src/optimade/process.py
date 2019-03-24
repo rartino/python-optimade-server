@@ -33,6 +33,7 @@ from .info_endpoint import generate_info_endpoint_reply, generate_entry_info_end
 from .entry_endpoint import generate_entry_endpoint_reply
 from .error import OptimadeError
 from parse import ParserSyntaxError, parse_optimade_filter
+from translate import TranslatorError
 
 
 def process(baseurl, relurl, query, query_function, debug=False):
@@ -89,7 +90,11 @@ def process(baseurl, relurl, query, query_function, debug=False):
                 pprint(filter_ast)
                 print("====")
 
-            result = query_function(tables, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
+            try:
+                result = query_function(tables, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
+            except TranslatorError as e:
+                raise OptimadeError(str(e), e.response_code, e.response_msg)
+                
             response = generate_entry_endpoint_reply(result)
         else:
             result = query_function(tables, response_fields, validated_parameters['response_limit'], debug=debug)

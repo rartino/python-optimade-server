@@ -28,7 +28,7 @@
 from __future__ import print_function
 
 from example_sqlite3 import database
-from translate import optimade_filter_to_sql, string_handler, integer_handler, elements_handler, chemical_formula_handler
+from translate import optimade_filter_to_sql
 
 database_column_mapper = {
     'structures': {

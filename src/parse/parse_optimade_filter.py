@@ -28,7 +28,7 @@
 import os, re
 from pprint import pprint
 
-from .miniparser import parser, build_ls, LogVerbosity
+from .miniparser import parser, build_ls
 
 ls = None
 
@@ -102,7 +102,6 @@ def simplify_optimade_filter_ast(ast):
 
 
 def simplify_optimade_filter_ast_recurse(node, recursion=0):
-    indent = recursion*"  "
 
     tree = [None]
     pos = tree

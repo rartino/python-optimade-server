@@ -54,5 +54,5 @@ properties_by_entry = dict([(x, entry_info[x]['properties']) for x in entry_info
 # In the future, not all properties may be valid response fields
 valid_response_fields = properties_by_entry
 
-valid_endpoints = ['info', 'all'] + all_entries + [x+"/info" for x in all_entries] + ['']
+valid_endpoints = list(['info', 'all'] + all_entries + [x+"/info" for x in all_entries] + [''])
 

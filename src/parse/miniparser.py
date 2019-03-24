@@ -359,7 +359,7 @@ class LogVerbosity(object):
         return self._get_verbosity(sys._getframe(1).f_code.co_name) == other
 
     def __sub__(self, other):
-        return self(self.verbosity - other, **flags)
+        return self(self.verbosity - other, **self.flags)
 
 #### Main functions
 
@@ -395,7 +395,6 @@ def parser(ls, source, verbosity=0, logger=logger):
     goto_table = ls['parse_table']['goto']
     symbol_stack = []
     state_stack = [1]
-    parse_stack = []
     symbol, inp, pos = next(tokens)
 
     while True:
@@ -489,7 +488,6 @@ def split_chars_strip_comments(source, comment_markers):
                 yield c, (l, p, line.rstrip('\n'))
         return
 
-    posbuf = []
     comment_start_markers = [x[0] for x in comment_markers]
     comments_dict = dict([(x[0], x[1]) for x in comment_markers])
     comment_end_marker = None
@@ -550,7 +548,6 @@ def lexer(source, tokens, literals, ignore, comment_markers=[], verbosity=0, log
       literals (list): a list of single character strings that are
                      to be treated as literals.
     """
-    stack = ""
     seen_token, seen_token_pos = None, None
     last_good_pos = (0, 0, "")
     last_good_pos_next = (0, 0, "")
@@ -681,9 +678,7 @@ def build_ls(ebnf_grammar=None, tokens={}, literals=None, precedence=[], ignore=
     if 'bnf_grammar_ast' not in ls:
         if ('ebnf_grammar' not in ls) and ('ebnf_grammar_ast' not in ls):
             raise ParserGrammarError("Parser grammar error: build_ls needs at least one of ebnf_grammar, ebnf_grammar_ast, or bnf_grammar_ast.")
-        if 'ebnf_grammar_ast' in ls:
-            ebnf_grammar_ast = ls['ebnf_grammar_ast']
-        else:
+        if 'ebnf_grammar_ast' not in ls:
             # First bootstrap ls_ebnf if it also is missing its parse table
             if 'parse_table' not in ls_ebnf:
                 build_ls(ls=ls_ebnf, verbosity=0, logger=logger)

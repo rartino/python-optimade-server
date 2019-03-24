@@ -1,6 +1,11 @@
 VERSION
 python_versions/ver2/python
 python_versions/ver3/python
+
+#eclipse
+.project
+.pydevproject
+
 # emacs
 \#*#
 .\#*

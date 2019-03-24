@@ -61,7 +61,7 @@ def validate(relurl, query):
     if endpoint in valid_endpoints:
         # Defensive programming; don't trust '=='/in to be byte-for-byte equivalent,
         # so don't use the insecure string from the user
-        validated_parameters['endpoint'] = valid_endpoints[valid_endpoints.index(endpoint)]
+        validated_parameters['endpoint'] = valid_endpoints[valid_endpoints.index(endpoint)] 
     else:
         endpoint, _sep, request_id = endpoint.rpartition('/')
         if endpoint in valid_endpoints:

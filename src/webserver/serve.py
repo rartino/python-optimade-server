@@ -25,7 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import print_function
-import cgitb, sys, codecs
+import cgitb, sys, codecs, cgi
 
 try:
     from urllib.parse import parse_qsl, urlparse
@@ -51,6 +51,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
     debug = False
 
     def get_debug_info(self):
+        parsed_path = urlparse(self.path)
         debug_info = {
             'CLIENT': {
                 'client_address=%s (%s)' % (self.client_address,
@@ -105,9 +106,9 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
                 self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
     def do_POST(self):
-        ctype, pdict = parse_header(self.headers['content-type'])
+        ctype, pdict = cgi.parse_header(self.headers['content-type'])
         if ctype == 'multipart/form-data':
-            postvars = parse_multipart(self.rfile, pdict)
+            postvars = cgi.parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
             postvars = dict(parse_qsl(self.rfile.read(length), keep_blank_values=True))
@@ -123,7 +124,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
 
         try:
             for callback in self.post_callbacks:
-                output = callback(relpath, query, self.headers)
+                output = callback(relpath, postvars, self.headers)
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()

@@ -31,8 +31,9 @@ This file provides functions to translate an OPTIMaDe filter string into an SQL 
 from __future__ import print_function
 from pprint import pprint
 
-supported_dialects = ['sqlite3']
+from .error import TranslatorError
 
+supported_dialects = ['sqlite3']
 
 def optimade_filter_to_sql(dialect, filter_ast, tables, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
 
@@ -115,7 +116,7 @@ def optimade_filter_to_sql_recurse(node, sql, columns_mapper, columns_handlers, 
             qs += handler(sql_column, op, value, sql)
     else:
         pprint(node)
-        raise Exception("Translation error")
+        raise TranslatorError("Unexpected translation error",500,"Internal server error.")
     return qs
 
 
@@ -143,6 +144,10 @@ def integer_handler(entry, op, value, sql):
 
 
 def elements_handler(entry, op, value, sql):
+
+    if op != '=':
+        raise TranslatorError("Elements can only be compared with equals operator.", 400, "Bad request.")
+    
     segments = []
     value = value[1:-1]
     els = value.split(",")
@@ -161,6 +166,18 @@ def elements_handler(entry, op, value, sql):
 
 def chemical_formula_handler(entry, op, value, sql):
     raise Exception("Not implemented yet.")
+
+
+def unknown_types_handler(val1, op, val2, sql):
+    sql_op = _sql_opmap[op]
+    if (val1.startswith('"') and val1.endswith('"')): 
+        val1 = val1[1:-1]
+    if (val2.startswith('"') and val2.endswith('"')): 
+        val2 = val2[1:-1]
+    param1 = _prep(val1, sql)
+    param2 = _prep(val2, sql)
+    return param1 + " "+sql_op+" " + param2
+
 
 
 optimade_valid_columns_per_table = {
