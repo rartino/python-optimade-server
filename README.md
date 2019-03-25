@@ -34,9 +34,20 @@ To run everything in full 'server' mode:
 ./start_serve_example_sqlite3.py
 ```
 Then go to `http://localhost:8080/info` in your browser, and you should
-see the OPTIMaDe API being served here.
+see the OPTIMaDe API being served here. You can try URLs such as:
+```
+http://localhost:8080/structures
+http://localhost:8080/calculations
+http://localhost:8080/structures/st-2
+http://localhost:8080/all?filter=id=%22st-2%22
+http://localhost:8080/structures?filter=elements="Al"
+http://localhost:8080/structures?filter=elements="Al,Ti"
+```
 
-There are some other examples of using parts of the provided
+For a more production-like deployment there is support for WSGI.
+See the instructions in `start_wsgi_example_sqlite.py`
+
+There are also some other examples of using parts of the provided
 routines in the directory `examples/`.
 
 

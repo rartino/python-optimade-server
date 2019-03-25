@@ -27,4 +27,5 @@
 
 from .serve import *
 from .jsonapi import *
+from .wsgi import *
 

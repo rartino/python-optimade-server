@@ -43,7 +43,7 @@ def validate(relurl, query):
         if validated_parameters['response_limit'] > 50:
             validated_parameters['response_limit'] = 50
 
-    endpoint = relurl.rstrip("/")
+    endpoint = relurl.strip("/")
 
     potential_optimade_version, _sep, rest = endpoint.partition('/')    
     
@@ -64,7 +64,7 @@ def validate(relurl, query):
         validated_parameters['endpoint'] = valid_endpoints[valid_endpoints.index(endpoint)] 
     else:
         endpoint, _sep, request_id = endpoint.rpartition('/')
-        if endpoint in valid_endpoints:
+        if endpoint in all_entries:
             # Defensive programming; don't trust '=='/in to be byte-for-byte equivalent,
             # so don't use the insecure string from the user
             validated_parameters['endpoint'] = valid_endpoints[valid_endpoints.index(endpoint)]
@@ -73,7 +73,7 @@ def validate(relurl, query):
             if all(ord(c) >= 32 and ord(c) <= 126 for c in request_id):
                 validated_parameters['request_id'] = request_id
             else:
-                raise OptimadeError("Unexpected characters in entry id.", 400, "Bad request") 
+                raise OptimadeError("Unexpected characters in entry id.", 400, "Bad request")
 
     if validated_parameters['endpoint'] is None:
         raise OptimadeError("Request for invalid endpoint.", 400, "Bad request")
