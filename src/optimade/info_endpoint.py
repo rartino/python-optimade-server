@@ -28,6 +28,7 @@
 from .entries import entry_info, all_entries
 from .versions import optimade_supported_versions
 
+
 def generate_info_endpoint_reply(baseurl, version):
     """
     This just returns a hardcoded introspection string.
@@ -35,7 +36,7 @@ def generate_info_endpoint_reply(baseurl, version):
     available_api_versions = {}
     for ver in optimade_supported_versions:
         available_api_versions[optimade_supported_versions[ver]] = baseurl + ver
-    
+
     response = {    
         "data": [
             {

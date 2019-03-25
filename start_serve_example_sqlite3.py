@@ -69,7 +69,7 @@ def request_callback(relurl, query, headers):
 
 if __name__ == "__main__":
     
-    import example_sqlite3 as backend    
+    import backends.example_sqlite3 as backend    
     
     backend.initialize()
     baseurl = 'http://localhost:8080/'

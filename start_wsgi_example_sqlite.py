@@ -89,7 +89,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'src'))
 import webserver
 import optimade
 from parse import parse_optimade_filter, ParserSyntaxError
-import example_sqlite3 as backend   
+import backends.example_sqlite3 as backend   
 
 baseurl = None
 

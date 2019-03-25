@@ -25,8 +25,9 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class TranslatorError(Exception):
-    def __init__(self, message, response_code, response_message, longmsg = None):
+    def __init__(self, message, response_code, response_message, longmsg=None):
         super(TranslatorError, self).__init__(message)
         self.response_code = response_code
         self.response_msg = response_message

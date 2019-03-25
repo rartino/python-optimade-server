@@ -23,7 +23,7 @@ dist: GENERATE_VERSION
 release:
 	( \
 		echo "Present release: $$(git describe --always)"; \
-		echo "Enter new tag:" \
+		echo "Enter new tag:"; \
 		read tag; \
 		git tag -s "$tag" -m "Release $tag"; \
 	)

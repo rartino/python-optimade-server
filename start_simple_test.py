@@ -39,7 +39,7 @@ from parse import parse_optimade_filter
 
 if __name__ == "__main__":
 
-    import example_sqlite3 as backend    
+    import backends.example_sqlite3 as backend    
     
     backend.initialize()
 

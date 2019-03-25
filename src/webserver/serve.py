@@ -164,7 +164,7 @@ def startup(get_callback, post_callback=None, port=80, baseurl=None, debug=False
     server = None
     try:
         server = HTTPServer(('', port), _CallbackRequestHandler)
-        print('Started httk webserver on port:',port)
+        print('Started httk webserver on port:', port)
         server.serve_forever()
 
     except KeyboardInterrupt:

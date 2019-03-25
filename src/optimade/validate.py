@@ -29,6 +29,7 @@ from .entries import all_entries, valid_endpoints, valid_response_fields
 from .error import OptimadeError
 from .versions import optimade_supported_versions, optimade_default_version
 
+
 def validate(relurl, query):
     validated_parameters = {'response_limit': 50, 'endpoint': None, 'response_fields': []}
 
@@ -46,7 +47,7 @@ def validate(relurl, query):
     endpoint = relurl.strip("/")
 
     potential_optimade_version, _sep, rest = endpoint.partition('/')    
-    
+
     if len(potential_optimade_version) > 2 and potential_optimade_version[0] == 'v' and potential_optimade_version[1] in "0123456789":
         if potential_optimade_version in optimade_supported_versions:
             validated_parameters['version'] = optimade_supported_versions[potential_optimade_version]
@@ -56,8 +57,7 @@ def validate(relurl, query):
 
     if 'version' not in validated_parameters:
         validated_parameters['version'] = optimade_default_version
-        
-        
+
     if endpoint in valid_endpoints:
         # Defensive programming; don't trust '=='/in to be byte-for-byte equivalent,
         # so don't use the insecure string from the user

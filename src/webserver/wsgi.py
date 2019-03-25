@@ -32,6 +32,7 @@ try:
 except ImportError:
     from urlparse import parse_qsl
 
+
 def wsgi_get_relurl(environ):
     if 'PATH_INFO' in environ:
         return environ['PATH_INFO']
@@ -40,7 +41,8 @@ def wsgi_get_relurl(environ):
 
 
 def wsgi_get_headers(environ):
-    return dict((x[5:],environ[x]) for x in environ if x.startswith("_HTTP_"))
+    return dict((x[5:], environ[x]) for x in environ if x.startswith("_HTTP_"))
+
 
 def wsgi_get_query(environ):
 
@@ -53,7 +55,7 @@ def wsgi_get_query(environ):
             return query
         else:
             return {}
-    
+
     if environ['REQUEST_METHOD'].upper() == 'POST':
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
@@ -68,8 +70,8 @@ def wsgi_get_query(environ):
             postvars = dict(parse_qsl(request_body, keep_blank_values=True))
         else:
             postvars = {}
-                
+
         return postvars
-    
+
     return {}
-    
+

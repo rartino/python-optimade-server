@@ -29,11 +29,13 @@ This file provides functions to translate an OPTIMaDe filter string into an SQL 
 '''
 
 from __future__ import print_function
+import re
 from pprint import pprint
 
 from .error import TranslatorError
 
 supported_dialects = ['sqlite3']
+
 
 def optimade_filter_to_sql(dialect, filter_ast, tables, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
 
@@ -116,7 +118,7 @@ def optimade_filter_to_sql_recurse(node, sql, columns_mapper, columns_handlers, 
             qs += handler(sql_column, op, value, sql)
     else:
         pprint(node)
-        raise TranslatorError("Unexpected translation error",500,"Internal server error.")
+        raise TranslatorError("Unexpected translation error", 500, "Internal server error.")
     return qs
 
 
@@ -147,7 +149,7 @@ def elements_handler(entry, op, value, sql):
 
     if op != '=':
         raise TranslatorError("Elements can only be compared with equals operator.", 400, "Bad request.")
-    
+
     segments = []
     value = value[1:-1]
     els = value.split(",")
@@ -164,8 +166,34 @@ def elements_handler(entry, op, value, sql):
     return "("+") AND (".join(segments)+")"
 
 
+# Assumes the formula is stored according to element name in the database
 def chemical_formula_handler(entry, op, value, sql):
-    raise Exception("Not implemented yet.")
+
+    if op != '=':
+        raise TranslatorError("Chemical formulas can only be compared with equals operator.", 400, "Bad request.")
+
+    value = value[1:-1]
+    segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', value))
+    sorted_formula = "".join(segments)
+    parameter = _prep(sorted_formula, sql)
+    return entry + " = " + parameter
+
+# Assumes the formula is stored according to element name in the database
+
+
+def formula_prototype_handler(entry, op, value, sql):
+
+    if op != '=':
+        raise TranslatorError("Formula prototypes can only be compared with equals operator.", 400, "Bad request.")
+
+    value = value[1:-1]
+    try:
+        segments = sorted((int(x[1]), x[0]) for x in re.findall('([A-Z][a-z]?)([0-9]*)', value))
+    except ValueError:
+        raise TranslatorError("Misformed formula_prototype request.", 400, "Bad request.")
+    sorted_formula = "".join([x[1]+str(x[0]) for x in segments])
+    parameter = _prep(sorted_formula, sql)
+    return entry + " = " + parameter
 
 
 def unknown_types_handler(val1, op, val2, sql):
@@ -179,7 +207,6 @@ def unknown_types_handler(val1, op, val2, sql):
     return param1 + " "+sql_op+" " + param2
 
 
-
 optimade_valid_columns_per_table = {
     'structures': {
         'id': ('String', string_handler),
@@ -187,7 +214,7 @@ optimade_valid_columns_per_table = {
         'elements': ('String', elements_handler),
         'nelements': ('Number', integer_handler),
         'chemical_formula': ('String', chemical_formula_handler),
-        'formula_prototype': ('String', chemical_formula_handler),
+        'formula_prototype': ('String', formula_prototype_handler),
     },
     'calculations': {
         'id': ('String', string_handler),

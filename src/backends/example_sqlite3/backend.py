@@ -26,8 +26,9 @@
 # SOFTWARE.
 
 from __future__ import print_function
+import re
 
-from example_sqlite3 import database
+from . import database
 from translate import optimade_filter_to_sql
 
 database_column_mapper = {
@@ -114,6 +115,13 @@ def _setup_test_data():
     ]
 
     for struct in structs:
+
+        segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', struct['chemical_formula']))
+        struct['chemical_formula'] = "".join(segments)
+
+        segments = sorted((int(x[1]), x[0]) for x in re.findall('([A-Z][a-z]?)([0-9]*)', struct['formula_prototype']))
+        struct['formula_prototype'] = "".join([x[1]+str(x[0]) for x in segments])
+
         database.execute("insert into structures values (:id,:local_id,:modification_date,:elements,:nelements,:chemical_formula,:formula_prototype)", struct)
 
     database.execute("create table calculations (id, local_id, modification_date)")

@@ -25,6 +25,6 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-optimade_supported_versions = {'v0.9.5':'0.9.5', 'v0.9':'0.9.5'}
+optimade_supported_versions = {'v0.9.5': '0.9.5', 'v0.9': '0.9.5'}
 optimade_default_version = '0.9.5'
 

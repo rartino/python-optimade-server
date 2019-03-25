@@ -27,7 +27,7 @@
 
 
 class OptimadeError(Exception):
-    def __init__(self, message, response_code, response_message, longmsg = None):
+    def __init__(self, message, response_code, response_message, longmsg=None):
         super(OptimadeError, self).__init__(message)
         self.response_code = response_code
         self.response_msg = response_message

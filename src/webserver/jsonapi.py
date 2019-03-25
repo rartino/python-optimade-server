@@ -27,6 +27,7 @@
 
 from .serve import WebError
 
+
 def check_jsonapi_header_requirements(headers):
     # Handle jsonapi MUSTs with regards to headers
     if 'Content-Type' in headers:
