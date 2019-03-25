@@ -26,7 +26,7 @@ release:
 		echo "Enter new tag:"; \
 		read tag; \
 		git tag -s "$$tag" -m "Release $$tag"; \
-		git git push -u origin "$$tag"; \
+		git push -u origin "$$tag"; \
 	)
 
 tests: unittests2 unittests3
