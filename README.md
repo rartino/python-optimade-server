@@ -7,7 +7,7 @@ created in the hope that it could, eventually, become a reference
 implementation of the OPTIMaDe API, at this point it does NOT
 have any official endorsment by OPTIMaDe.*
 
-Furthermore, the 'API' that is formed by the routines unde `src/`
+Furthermore, the 'API' that is formed by the routines under `src/`
 should in no sense at this point be considered stable.
 
 This software will for the moment use version numbers
