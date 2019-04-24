@@ -28,7 +28,7 @@
 from pprint import pprint
 
 from .entries import all_entries, valid_response_fields
-from .validate import validate
+from .validate import validate_query, validate_request
 from .info_endpoint import generate_info_endpoint_reply, generate_entry_info_endpoint_reply, generate_base_endpoint_reply
 from .entry_endpoint import generate_entry_endpoint_reply
 from .error import OptimadeError
@@ -36,26 +36,32 @@ from parse import ParserSyntaxError, parse_optimade_filter
 from translate import TranslatorError
 
 
-def process(baseurl, relurl, query, query_function, debug=False):
+def process(baseurl, relurl_or_request, query, query_function, debug=False):
 
     if debug:
-        print("==== OPTIMADE REQUEST FOR:", relurl, "WITH PARAMETERS:")
+        print("==== OPTIMADE REQUEST FOR:", relurl_or_request, "WITH PARAMETERS:")
         pprint(query)
         print("====")
 
-    validated_parameters = validate(relurl, query)
+    validated_request = validate_request(relurl_or_request)
+    endpoint = validated_request['endpoint']
+    request_id = validated_request['request_id']
+    version = validated_request['version']
+        
+    validated_parameters = validate_query(endpoint, query)
 
     if debug:
-        print("==== VALIDATED PARAMETERS:")
+        print("==== VALIDATED ENDPOINT, REQUEST_ID, AND PARAMETERS:")
+        print("ENDPOINT:",endpoint)
+        print("REQUEST_ID:",request_id)
         pprint(validated_parameters)
         print("====")
 
-    endpoint = validated_parameters['endpoint']
     if endpoint == '':
         response = generate_base_endpoint_reply()
 
     elif endpoint == 'info':
-        response = generate_info_endpoint_reply(baseurl, validated_parameters['version'])
+        response = generate_info_endpoint_reply(baseurl, version)
 
     elif endpoint in all_entries or endpoint == 'all':
 
@@ -72,9 +78,9 @@ def process(baseurl, relurl, query, query_function, debug=False):
 
         input_string = None
         filter_ast = None
-        if 'request_id' in validated_parameters:
-            input_string = 'filter=id="'+validated_parameters['request_id']+'"'
-            filter_ast = ('=', ('Identifier', 'id'), ('String', '"'+validated_parameters['request_id']+'"'))
+        if request_id is not None:
+            input_string = 'filter=id="'+request_id+'"'
+            filter_ast = ('=', ('Identifier', 'id'), ('String', '"'+request_id+'"'))
         elif 'filter' in validated_parameters:
             input_string = validated_parameters['filter']
 
