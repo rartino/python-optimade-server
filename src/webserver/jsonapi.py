@@ -31,12 +31,12 @@ from .serve import WebError
 def check_jsonapi_header_requirements(headers):
     # Handle jsonapi MUSTs with regards to headers
     if 'Content-Type' in headers:
-        _media_type, parameter = headers['Content-Type'].partition(";")
+        _media_type, _sep, parameter = headers['Content-Type'].partition(";")
         if parameter.strip() != '':
             raise WebError("Requested content-type violates jsonapi requirements.", 415, "Unsupported Media Type")
 
     if 'Accept' in headers and "JSON:API" in headers['Accept']:
-        _accept, parameter = headers['Content-Type'].partition(";")
+        _accept, _sep, parameter = headers['Content-Type'].partition(";")
         if parameter.strip() != '':
             raise WebError("Accept header violtates jsonapi requirements.", 406, "Not Acceptable")
 
