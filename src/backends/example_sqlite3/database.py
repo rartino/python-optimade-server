@@ -26,30 +26,27 @@
 # SOFTWARE.
 
 import sqlite3
+import threading
 
-_con = None
-_cur = None
+_threadlocal = threading.local()
 
-
+def is_initialized():
+    return hasattr(_threadlocal,'con')
+    
 def initalize():
-    global _con, _cur
-    _con = sqlite3.connect(":memory:")    
-    _cur = _con.cursor()
-
+    _threadlocal.con = sqlite3.connect(":memory:")    
+    _threadlocal.cur = _threadlocal.con.cursor()
 
 def execute(sql, parameters={}):
-    global _cur
-    return _cur.execute(sql, parameters)
+    return _threadlocal.cur.execute(sql, parameters)
 
 
 def commit():
-    global _cur
-    return _con.commit()
+    return _threadlocal.con.commit()
 
 
 def close():
-    global _cur
-    _cur.close()
+    _threadlocal.cur.close()
 
 
 

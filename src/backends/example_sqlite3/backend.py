@@ -53,6 +53,9 @@ database_table_mapper = {
 }
 
 
+def is_initialized():
+    return database.is_initialized()
+
 def initialize():
 
     database.initalize()
