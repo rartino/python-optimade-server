@@ -27,28 +27,32 @@
 
 import sqlite3
 import threading
+from optimade import OptimadeResults
 
-_threadlocal = threading.local()
+class Database(object): 
 
-def is_initialized():
-    return hasattr(_threadlocal,'con')
-    
-def initalize():
-    _threadlocal.con = sqlite3.connect(":memory:")    
-    _threadlocal.cur = _threadlocal.con.cursor()
+    def __init__(self):
+        self.threadlocal = threading.local()
+        self.threadlocal.con = sqlite3.connect(":memory:")    
+        self.threadlocal.cur = self.threadlocal.con.cursor()
 
-def execute(sql, parameters={}):
-    return _threadlocal.cur.execute(sql, parameters)
+    def execute(self,sql, parameters={}):
+        if hasattr(self.threadlocal,'cur'):
+            results = self.threadlocal.cur.execute(sql, parameters) 
+            return OptimadeResults(list(results),results.description)
+        else:
+            raise Exception("Trying to access in-memory database across threads.")
 
-
-def commit():
-    return _threadlocal.con.commit()
-
-
-def close():
-    _threadlocal.cur.close()
-
-
-
-
+    def commit(self):
+        if hasattr(self.threadlocal,'con'):
+            return self.threadlocal.con.commit()
+        else:
+            raise Exception("Trying to access in-memory database across threads.")
+            
+    def close(self):
+        if hasattr(self.threadlocal,'cur'):        
+            self.threadlocal.cur.close()
+            self.threadlocal.con.close()
+        else:
+            raise Exception("Trying to access in-memory database across threads.")        
 

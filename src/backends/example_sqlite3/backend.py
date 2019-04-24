@@ -28,8 +28,10 @@
 from __future__ import print_function
 import re
 
-from . import database
+from . import database as default_database
 from translate import optimade_filter_to_sql
+
+database = None
 
 database_column_mapper = {
     'structures': {
@@ -53,12 +55,13 @@ database_table_mapper = {
 }
 
 
-def is_initialized():
-    return database.is_initialized()
-
-def initialize():
-
-    database.initalize()
+def initialize(db = None):
+    global database
+    
+    if db is None:
+        database = default_database.Database()
+    else:
+        database = db
     _setup_test_data()
 
 
@@ -98,6 +101,7 @@ def close():
 
 
 def _setup_test_data():
+    database.execute("drop table if exists structures")
     database.execute("create table structures (id, local_id, modification_date, elements, nelements, chemical_formula, formula_prototype)")
 
     structs = [
@@ -127,6 +131,7 @@ def _setup_test_data():
 
         database.execute("insert into structures values (:id,:local_id,:modification_date,:elements,:nelements,:chemical_formula,:formula_prototype)", struct)
 
+    database.execute("drop table if exists calculations")        
     database.execute("create table calculations (id, local_id, modification_date)")
 
     calcs = [

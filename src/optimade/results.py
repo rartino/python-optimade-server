@@ -25,8 +25,11 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .info_endpoint import *
-from .entry_endpoint import *
-from .validate import *
-from .process import *
-from .results import *
+class OptimadeResults(object):
+
+    def __init__(self, data, description):
+        self.data = data
+        self.description = description
+
+    def __iter__(self):
+        return iter(self.data)
