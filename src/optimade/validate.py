@@ -33,10 +33,12 @@ from .versions import optimade_supported_versions, optimade_default_version
 def validate_query(endpoint, query):
     validated_parameters = {'response_limit': 50, 'response_fields': []}
 
-    if 'response_format' in query and 'response_format' != 'json':
+    if ('response_format' in query and query['response_format'] is not None) and 'response_format' != 'jsonapi':
         raise OptimadeError("Requested response_format not supported.", 400, "Bad request")
-
-    if 'response_limit' in query:
+    else:
+        validated_parameters['response_format'] = 'jsonapi'
+    
+    if 'response_limit' in query and query['response_limit'] is not None:
         try:
             validated_parameters['response_limit'] = int(query['response_limit'])
         except ValueError:
@@ -44,14 +46,14 @@ def validate_query(endpoint, query):
         if validated_parameters['response_limit'] > 50:
             validated_parameters['response_limit'] = 50
 
-    if 'response_fields' in query:
+    if 'response_fields' in query and query['response_fields'] is not None:
         response_fields = [x.strip() for x in query['response_fields'].split(",")]
         for response_field in response_fields:
             if response_field in valid_response_fields[endpoint]:
                 validated_parameters['response_fields'] += [valid_response_fields[endpoint][valid_response_fields[endpoint].index(response_field)]]
 
     # Validating the filter string is deferred to its parser
-    if 'filter' in query:
+    if 'filter' in query and query['filter'] is not None:
         validated_parameters['filter'] = "filter="+query['filter']
 
     return validated_parameters
