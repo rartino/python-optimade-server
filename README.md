@@ -47,9 +47,20 @@ http://localhost:8080/structures?filter=elements="Al,Ti"
 For a more production-like deployment there is support for WSGI.
 See the instructions in `start_wsgi_example_sqlite.py`
 
+There is also a bare-bones implementation of serving the API
+via the Django-rest-framework. Enter the `django` subdirectory
+and then run the `serve_django.sh` script. You can then visit
+URLs such as:
+```
+http://localhost:8000/structures
+```
+etc. It would make sense to combine this way of serving of the API
+with a backend that uses Django object relational mapping rather
+than a raw sqlite database and SQL queries. Such a backend is not
+yet provided here.
+
 There are also some other examples of using parts of the provided
 routines in the directory `examples/`.
-
 
 Notes: 
 
