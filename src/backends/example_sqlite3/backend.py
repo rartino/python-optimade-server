@@ -107,23 +107,6 @@ def _setup_test_data():
 
     teststructs = get_test_structures()
     
-    structs = [
-        {'id': 'st-1', 'local_id': 'st-1', 'modification_date': '2019-03-20 23:45',
-         'elements': 'Al,Ga,Ti', 'nelements': 3, 'chemical_formula': 'Al3Ga2Ti3', 'formula_prototype': 'A3B2C3'},
-        {'id': 'st-2', 'local_id': 'st-2', 'modification_date': '2019-03-20 23:45',
-         'elements': 'Al,Ga', 'nelements': 2, 'chemical_formula': 'Al3Ga2', 'formula_prototype': 'A3B2'},
-        {'id': 'st-3', 'local_id': 'st-3', 'modification_date': '2019-03-20 23:45',
-         'elements': 'Al,N,Ga,Ti', 'nelements': 4, 'chemical_formula': 'Al3Ga2Ti3N2', 'formula_prototype': 'A3B2C3D2'},
-        {'id': 'st-4', 'local_id': 'st-4', 'modification_date': '2019-03-20 23:45',
-         'elements': 'B,C', 'nelements': 2, 'chemical_formula': 'B6C7', 'formula_prototype': 'A6B7'},
-        {'id': 'st-5', 'local_id': 'st-5', 'modification_date': '2019-03-20 23:45',
-         'elements': 'Al,C', 'nelements': 2, 'chemical_formula': 'Al3C6', 'formula_prototype': 'A3C6'},
-        {'id': 'st-6', 'local_id': 'st-6', 'modification_date': '2019-03-20 23:45',
-         'elements': 'Ga,Ti', 'nelements': 2, 'chemical_formula': 'Ga26Ti12', 'formula_prototype': 'A26B12'},
-        {'id': 'st-7', 'local_id': 'st-7', 'modification_date': '2019-03-20 23:45',
-         'elements': 'C', 'nelements': 1, 'chemical_formula': 'C60', 'formula_prototype': 'A60'},        
-    ]
-
     for teststruct in teststructs:
 
         struct = {}
