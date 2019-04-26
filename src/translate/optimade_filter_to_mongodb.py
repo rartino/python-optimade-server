@@ -24,7 +24,17 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+'''
+This file provides functions to translate an OPTIMaDe filter string into an SQL query. 
+'''
 
-from .optimade_filter_to_sql import *
-from .optimade_filter_to_mongodb import *
-from .error import *
+from __future__ import print_function
+import re
+from pprint import pprint
+
+from .error import TranslatorError
+
+def optimade_filter_to_mongodb(filter_ast, entries, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
+
+    raise Exception("Not implemented yet.")
+    

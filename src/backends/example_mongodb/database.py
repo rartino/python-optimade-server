@@ -25,6 +25,43 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .optimade_filter_to_sql import *
-from .optimade_filter_to_mongodb import *
-from .error import *
+import pymongo
+import threading
+
+class Database(object): 
+
+    def __init__(self):
+        self.client = pymongo.MongoClient()
+        self.db = self.client.optimade_test
+
+    def empty_database(self):
+        self.client.drop_database("optimade_test")
+        self.db = self.client.optimade_test
+        
+    def collection_destroy_if_exists(self,coll):
+        self.db[coll].remove({})
+        if coll in self.db.list_collection_names():
+            self.db[coll].drop()
+    
+    def insert(self,coll,data):
+        self.db[coll].posts.insert_one(data)
+
+    def insert_many(self,coll,datas):
+        try:
+            self.db[coll].posts.insert_many(datas)        
+        except pymongo.errors.BulkWriteError as e:
+            print(e.details)
+            raise
+            
+    def find(self,coll,query,fields=None):
+        if fields is None:
+            return self.db[coll].find(query,fields)
+        else:
+            return self.db[coll].find(query,dict([(x,1) for x in fields]))
+    
+    def find_one(self,coll,query):
+        return self.db[coll].find_one(query)    
+            
+    def close(self):
+        self.client.close()
+
