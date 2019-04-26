@@ -54,8 +54,8 @@ class OptimadeStructure(object):
         self.cifdata = cifdata
 
         formula_components = {}
-        for entry in species.values():
-            for element, occupancy in zip(entry['chemical_symbols'],entry['concentration']):
+        for entry in species_at_sites:
+            for element, occupancy in zip(species[entry]['chemical_symbols'],species[entry]['concentration']):
                 if element in formula_components:
                     formula_components[element] += occupancy
                 else:
@@ -66,8 +66,8 @@ class OptimadeStructure(object):
         if chemical_formula is not None:
             self.chemical_formula = chemical_formula
         else:
-            formula_components_list = sorted(formula_components, key=formula_components.get)
-            self.chemical_formula = "".join(formula_components_list)
+            formula_components_order = sorted(formula_components, key=formula_components.get)
+            self.chemical_formula = "".join([x + "%g" % formula_components[x] for x in formula_components_order])
 
         prototype_formula_components = re.findall('([A-Z][a-z]?)([0-9.]*)',self.chemical_formula)
         prototype_formula_components = sorted([(float(occ),occ) if occ != '' else (1.0,'') for el,occ in prototype_formula_components])
