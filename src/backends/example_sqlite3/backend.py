@@ -30,6 +30,7 @@ import re
 
 from . import database as default_database
 from translate import optimade_filter_to_sql
+from testdata import get_test_structures
 
 database = None
 
@@ -104,6 +105,8 @@ def _setup_test_data():
     database.execute("drop table if exists structures")
     database.execute("create table structures (id, local_id, modification_date, elements, nelements, chemical_formula, formula_prototype)")
 
+    teststructs = get_test_structures()
+    
     structs = [
         {'id': 'st-1', 'local_id': 'st-1', 'modification_date': '2019-03-20 23:45',
          'elements': 'Al,Ga,Ti', 'nelements': 3, 'chemical_formula': 'Al3Ga2Ti3', 'formula_prototype': 'A3B2C3'},
@@ -121,13 +124,20 @@ def _setup_test_data():
          'elements': 'C', 'nelements': 1, 'chemical_formula': 'C60', 'formula_prototype': 'A60'},        
     ]
 
-    for struct in structs:
+    for teststruct in teststructs:
 
-        segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', struct['chemical_formula']))
+        struct = {}
+
+        struct['id'] = teststruct.id
+        struct['local_id'] = teststruct.id
+        struct['modification_date'] = teststruct.modification_date
+        struct['nelements'] = teststruct.nelements
+        
+        segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', teststruct.chemical_formula))
         struct['chemical_formula'] = "".join(segments)
 
-        segments = sorted((int(x[1]), x[0]) for x in re.findall('([A-Z][a-z]?)([0-9]*)', struct['formula_prototype']))
-        struct['formula_prototype'] = "".join([x[1]+str(x[0]) for x in segments])
+        struct['formula_prototype'] = teststruct.formula_prototype
+        struct['elements'] = teststruct.elements
 
         database.execute("insert into structures values (:id,:local_id,:modification_date,:elements,:nelements,:chemical_formula,:formula_prototype)", struct)
 
