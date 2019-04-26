@@ -37,7 +37,7 @@ from .error import TranslatorError
 supported_dialects = ['sqlite3']
 
 
-def optimade_filter_to_sql(dialect, filter_ast, tables, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
+def optimade_filter_to_sql(dialect, filter_ast, entries, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
 
     if dialect not in supported_dialects:
         raise Exception("optimade_filter_to_sql: Requested dialect is not supported: "+str(dialect))
@@ -57,20 +57,20 @@ def optimade_filter_to_sql(dialect, filter_ast, tables, response_fields, tables_
     sqlstr = ""
     sql_tbl_strs = []
 
-    for table in tables:
+    for entry in entries:
         sql_tbl_str = ""
         if len(response_fields) > 0:
-            sql_tbl_str += "SELECT "+",".join(response_fields)+", '"+table + "' AS type, id"+" \n"
+            sql_tbl_str += "SELECT "+",".join(response_fields)+", '"+entry + "' AS type, id"+" \n"
         else:
-            if len(tables) > 1:
-                raise Exception("Must give response_fields if giving more than one table to union.")
+            if len(entries) > 1:
+                raise Exception("Must give response_fields if giving more than one entry to union.")
             else:
-                sql_tbl_str += "SELECT *,'"+tables_mapper[table]+"' AS type \n"
+                sql_tbl_str += "SELECT *,'"+tables_mapper[entry]+"' AS type \n"
 
-        sql_tbl_str += sqlstr + "FROM " + table + " \n" 
+        sql_tbl_str += sqlstr + "FROM " + entry + " \n" 
 
         if filter_ast is not None:
-            qs = optimade_filter_to_sql_recurse(filter_ast, sql, columns_mapper[table], optimade_valid_columns_per_table[table], indent=indent)
+            qs = optimade_filter_to_sql_recurse(filter_ast, sql, columns_mapper[entry], optimade_valid_columns_per_entry[entry], indent=indent)
             sql_tbl_str += "WHERE " + qs + " \n"
 
         sql_tbl_strs += [sql_tbl_str]
@@ -207,7 +207,7 @@ def unknown_types_handler(val1, op, val2, sql):
     return param1 + " "+sql_op+" " + param2
 
 
-optimade_valid_columns_per_table = {
+optimade_valid_columns_per_entry = {
     'structures': {
         'id': ('String', string_handler),
         'modification_date': ('String', string_handler),

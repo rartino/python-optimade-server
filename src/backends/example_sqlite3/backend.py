@@ -66,9 +66,9 @@ def initialize(db = None):
     _setup_test_data()
 
 
-def execute_query(tables, response_fields, response_limit, optimade_filter_ast=None, debug=False):
+def execute_query(entries, response_fields, response_limit, optimade_filter_ast=None, debug=False):
 
-    result = optimade_filter_to_sql('sqlite3', optimade_filter_ast, tables, response_fields, database_table_mapper, database_column_mapper, response_limit)
+    result = optimade_filter_to_sql('sqlite3', optimade_filter_ast, entries, response_fields, database_table_mapper, database_column_mapper, response_limit)
     sql, parameters = result['sql'], result['parameters']
 
     # Just to show the results on screen

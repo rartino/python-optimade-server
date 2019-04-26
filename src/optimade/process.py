@@ -68,9 +68,9 @@ def process(baseurl, relurl_or_request, query, query_function, debug=False):
         response_fields = validated_parameters['response_fields']
 
         if endpoint != 'all':
-            tables = [endpoint]
+            entries = [endpoint]
         else:
-            tables = all_entries
+            entries = all_entries
             if len(response_fields) == 0:
                 response_fields = set(valid_response_fields[all_entries[0]])
                 for entry in all_entries:
@@ -97,13 +97,13 @@ def process(baseurl, relurl_or_request, query, query_function, debug=False):
                 print("====")
 
             try:
-                result = query_function(tables, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
+                result = query_function(entries, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
             except TranslatorError as e:
                 raise OptimadeError(str(e), e.response_code, e.response_msg)
 
             response = generate_entry_endpoint_reply(result)
         else:
-            result = query_function(tables, response_fields, validated_parameters['response_limit'], debug=debug)
+            result = query_function(entries, response_fields, validated_parameters['response_limit'], debug=debug)
 
             response = generate_entry_endpoint_reply(result)
 
