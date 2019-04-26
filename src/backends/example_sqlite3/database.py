@@ -27,7 +27,6 @@
 
 import sqlite3
 import threading
-from optimade import OptimadeResults
 
 class Database(object): 
 
@@ -39,7 +38,9 @@ class Database(object):
     def execute(self,sql, parameters={}):
         if hasattr(self.threadlocal,'cur'):
             results = self.threadlocal.cur.execute(sql, parameters) 
-            return OptimadeResults(list(results),results.description)
+            data = [dict([(name[0],d) for name,d in zip(results.description, row)]) for row in results]
+            print "HERE",data
+            return data
         else:
             raise Exception("Trying to access in-memory database across threads.")
 

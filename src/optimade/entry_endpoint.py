@@ -32,8 +32,7 @@ def generate_entry_endpoint_reply(data):
     """
 
     data_part = []
-    for row in data:
-        d = dict(zip([x[0] for x in data.description], row))
+    for d in data:
         attributes = dict(d)
         del attributes['id']
         del attributes['type']

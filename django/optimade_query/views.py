@@ -18,7 +18,6 @@ from django.conf import settings
 from django.db import connections
 import json
 import optimade
-from optimade import OptimadeResults
 
 import backends.example_sqlite3 as backend
 
@@ -30,7 +29,7 @@ class Database(object):
     def execute(self,sql, parameters={}):
         with connections['default'].cursor() as cursor:
             results = cursor.execute(sql, parameters)
-            return OptimadeResults(list(results),results.description)
+            return [dict([(name[0],d) for name,d in zip(results.description, row)]) for row in results]
 
     def commit(self):
         return True
