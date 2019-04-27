@@ -46,6 +46,7 @@ database_column_mapper = {
     },
     'calculations': {
         'id': 'id',
+        'local_id': 'local_id',
         'modification_date': 'modification_date',
     }
 }
