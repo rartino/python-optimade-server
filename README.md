@@ -15,12 +15,24 @@ that start with the OPTIMaDe specification it implements, and then
 append a version number to that. E.g., v0.9.5.1 for 
 implementing v0.9.5 of the OPTIMaDe specification.
 
+# Installation
+
 Download:
 ```
 git clone https://github.com/Materials-Consortia/python-optimade-candidate-reference-implementation.git
 ```
 
-To do some simple tests, run:
+Dependencies:
+
+- Python webserver serving the sqlite3 example backend: no dependencies
+- Built-in Python wsgi serving of the sqlite3 example backend: no dependencies
+- Other webserver, e.g., apache wsgi serving the sqlite3 example backend: apache or corresponding.
+- Django serving the sqlite3 example backend: django and django-rest-framework 
+- Mongodb example backend: pymongo and a running instance of mongod on localhost port 27017
+
+# Simple test runs
+
+Some simple tests can be run by:
 ```
 ./start_simple_test.py
 ```
@@ -29,7 +41,9 @@ To just try a manual filter-type query using the example\_sqlite3 backend. This 
 ./start_simple_test.py 'id="st-6"'
 ```
 
-To run everything in full 'server' mode:
+# Sqlite3 example backend
+
+To run the sqlite3 example backend in full 'server' mode:
 ```
 ./start_serve_example_sqlite3.py
 ```
@@ -44,9 +58,11 @@ http://localhost:8080/structures?filter=elements="Al"
 http://localhost:8080/structures?filter=elements="Al,Ti"
 ```
 
+## WSGI
 For a more production-like deployment there is support for WSGI.
 See the instructions in `start_wsgi_example_sqlite.py`
 
+## Django
 There is also a bare-bones implementation of serving the API
 via the Django-rest-framework. Enter the `django` subdirectory
 and then run the `serve_django.sh` script. You can then visit
@@ -59,10 +75,22 @@ with a backend that uses Django object relational mapping rather
 than a raw sqlite database and SQL queries. Such a backend is not
 yet provided here.
 
+# MongoDB example backend
+
+To run the MongoDB example backend in full 'server' mode:
+```
+./start_serve_example_mongodb.py
+```
+Then go to `http://localhost:8080/info` in your browser, and you should
+see the OPTIMaDe API being served here. You can try, e.g., the same URLs as
+listed in the sqlite3 example backend section.
+
+# Other examples
+
 There are also some other examples of using parts of the provided
 routines in the directory `examples/`.
 
-Notes: 
+# Notes 
 
 - The parser of OPTIMaDe filter strings is relatively well-tested. 
   However, the parser output is then re-translated into a simpler 

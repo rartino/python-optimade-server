@@ -33,7 +33,7 @@ class Database(object):
     def __init__(self):
         self.client = pymongo.MongoClient()
         self.db = self.client.optimade_test
-
+        
     def empty_database(self):
         self.client.drop_database("optimade_test")
         self.db = self.client.optimade_test
@@ -44,21 +44,27 @@ class Database(object):
             self.db[coll].drop()
     
     def insert(self,coll,data):
-        self.db[coll].posts.insert_one(data)
+        self.db[coll].insert_one(data)
 
     def insert_many(self,coll,datas):
         try:
-            self.db[coll].posts.insert_many(datas)        
+            x = self.db[coll].insert_many(datas)
         except pymongo.errors.BulkWriteError as e:
             print(e.details)
             raise
             
-    def find(self,coll,query,fields=None):
-        if fields is None:
-            return self.db[coll].find(query,fields)
+    def find(self,coll,query,projection=None, limit = None):
+        if projection is None or projection == []:
+            if limit is None:
+                return self.db[coll].find(query)
+            else:
+                return self.db[coll].find(query).limit(limit)
         else:
-            return self.db[coll].find(query,dict([(x,1) for x in fields]))
-    
+            if limit is None:
+                return self.db[coll].find(query,dict([(x,1) for x in projection]))
+            else:
+                return self.db[coll].find(query,dict([(x,1) for x in projection])).limit(limit)
+                
     def find_one(self,coll,query):
         return self.db[coll].find_one(query)    
             

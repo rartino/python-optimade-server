@@ -127,7 +127,7 @@ def cif_to_structs(cif):
         lattice_vectors = [[a, 0, 0], [b*cosgamma, b*singamma, 0], [c*cosbeta, c*angfac1, c*angfac2]]
         
         # Coords
-        all_coords = zip(data['atom_site_fract_x'], data['atom_site_fract_y'], data['atom_site_fract_z'])
+        all_coords = list(zip(data['atom_site_fract_x'], data['atom_site_fract_y'], data['atom_site_fract_z']))
         all_uniq_coords = []
         mapper = [None]*len(all_coords)
         j = 0
