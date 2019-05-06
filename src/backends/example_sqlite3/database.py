@@ -39,7 +39,6 @@ class Database(object):
         if hasattr(self.threadlocal,'cur'):
             results = self.threadlocal.cur.execute(sql, parameters) 
             data = [dict([(name[0],d) for name,d in zip(results.description, row)]) for row in results]
-            print "HERE",data
             return data
         else:
             raise Exception("Trying to access in-memory database across threads.")
