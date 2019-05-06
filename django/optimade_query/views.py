@@ -20,6 +20,7 @@ import json
 import optimade
 
 import backends.example_sqlite3 as backend
+from webserver import JsonapiError
 
 class Database(object): 
 
@@ -50,7 +51,8 @@ def base_endpoint(request, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
     
 @api_view(["GET","POST"])
@@ -62,7 +64,8 @@ def base_info(request, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
     
 @api_view(["GET","POST"])
@@ -74,7 +77,8 @@ def base_all(request, id = None, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
 
 @api_view(["GET","POST"])
@@ -86,19 +90,21 @@ def structures_info(request, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
     
 @api_view(["GET","POST"])
 def structures(request, id = None, version = None):
-    optimade_request = {'endpoint':'all', 'request_id':id, 'version':version}
+    optimade_request = {'endpoint':'structures', 'request_id':id, 'version':version}
     query = request.query_params
     try:
         output = optimade.process(reverse('base_endpoint', request=request),optimade_request,query,backend.execute_query, debug=True)
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
 
 @api_view(["GET","POST"])
@@ -110,8 +116,9 @@ def calculations_info(request, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
-
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
+    
     
 @api_view(["GET","POST"])
 def calculations(request, id = None, version = None):
@@ -122,7 +129,8 @@ def calculations(request, id = None, version = None):
         response = JsonResponse(output, safe=False,content_type='application/vnd.api+json')
         return response
     except optimade.OptimadeError as e:
-        return Response(e.args[0],e.response_code)
+        error = JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        return JsonResponse(error.content_json, safe=False,content_type='application/vnd.api+json', status=error.response_code)
 
 
 

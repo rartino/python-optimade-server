@@ -25,9 +25,66 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
+
 from .serve import WebError
 
+_jsonapi_response_codes = {
+    '200':'OK',
+    '201':'Created',
+    '202':'Accepted',
+    '204':'No Content',
+    '403':'Forbidden',
+    '400':'Bad Request',
+    '404':'Not Found',
+    '406':'Not Acceptable',
+    '409':'Conflict',
+    '415':'Unsupported Media Type',
+    '500':'Internal Server Error'
+}
 
+class JsonapiError(WebError):
+    def __init__(self, message, response_code, response_msg=None, longmsg=None, idstr=None, links=None, code=None, source=None, meta=None, indent=True):
+
+        self.content = longmsg if longmsg is not None else message
+        self.response_code = response_code
+        self.content_type = 'application/vnd.api+json'
+        self.response_msg = response_msg if response_msg is not None else _jsonapi_response_codes[str(response_code)]
+        self.id = idstr
+        self.links = links
+        self.code = code
+        self.source = source
+        self.meta = meta
+        self.indent = indent
+        
+        errordata = {}
+        
+        if idstr is not None:
+            errordata['id'] = idstr
+
+        if code is not None:
+            errordata['code'] = code
+
+        if source is not None:
+            errordata['source'] = source            
+
+        if meta is not None:
+            errordata['meta'] = meta
+
+        errordata['status'] = str(response_code)
+        errordata['title'] = str(self.response_msg)
+        errordata['detail'] = str(self.content)
+
+        self.content_json = {'errors':errordata}
+
+        if indent:
+            message = json.dumps(self.content_json, indent=4, separators=(',', ': '), sort_keys=True)
+        else:
+            message = json.dumps(self.content_json, separators=(',', ': '), sort_keys=True)
+
+            
+        super(JsonapiError, self).__init__(message, response_code, response_msg, longmsg, self.content_type)
+        
 def check_jsonapi_header_requirements(headers):
     # Handle jsonapi MUSTs with regards to headers
     if 'Content-Type' in headers:

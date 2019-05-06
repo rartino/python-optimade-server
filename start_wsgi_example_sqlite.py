@@ -107,8 +107,10 @@ def app(environ, start_response):
     try:
         response = optimade.process(baseurl, relurl, query, backend.execute_query, debug = True)
     except optimade.OptimadeError as e:
-        start_response(str(e.response_code) + " "+str(e.response_msg), [('Content-Type','text/plain')])
-        return ["Could not process request: "+str(e)]
+        error = webserver.JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
+        
+        start_response(str(error.response_code) + " "+str(error.response_msg), [('Content-Type',error.content_type)])
+        return [error.content]
 
     start_response('200 OK', [('Content-Type','application/vnd.api+json')])
     return [_json_format(response)]
