@@ -83,7 +83,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
 
         # Figure out what part of the URL is part of netloc and basepath used for hosting, and the rest (=representation)
         relpath = parsed_path.path
-        if relpath[0] == '/':
+        if len(relpath)>0 and relpath[0] == '/':
             relpath = relpath[1:]
 
         basepath = self.basepath
@@ -137,6 +137,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
                 self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
     def do_POST(self):
+
         ctype, pdict = cgi.parse_header(self.headers['content-type'])
         if ctype == 'multipart/form-data':
             postvars = cgi.parse_multipart(self.rfile, pdict)
@@ -147,10 +148,11 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             postvars = {}
 
         parsed_path = urlsplit(self.path)
-
+        query = dict(parse_qsl(parsed_path.query, keep_blank_values=True))
+        
         # Figure out what part of the URL is part of netloc and basepath used for hosting, and the rest (=representation)
         relpath = parsed_path.path
-        if relpath[0] == '/':
+        if len(relpath)>0 and relpath[0] == '/':
             relpath = relpath[1:]
 
         basepath = self.basepath
@@ -203,6 +205,10 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             else:
                 self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
+    # Redirect log messages to stdout instead of stderr
+    def log_message(self, format, *args):
+        print(format % args)
+                
 
 def startup(get_callback, post_callback=None, port=80, netloc=None, basepath='/', debug=False):
 
@@ -225,6 +231,7 @@ def startup(get_callback, post_callback=None, port=80, netloc=None, basepath='/'
     try:
         server = HTTPServer(('', port), _CallbackRequestHandler)
         print('Started httk webserver on port:', port)
+        sys.stdout.flush()
         server.serve_forever()
 
     except KeyboardInterrupt:

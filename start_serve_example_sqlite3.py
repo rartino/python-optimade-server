@@ -41,7 +41,7 @@ Implementations that want to start off from this one, should:
 - Copy this program and change it to use that backend instead.
 '''
 from __future__ import print_function
-import os, sys, json
+import os, sys, json, signal
 from pprint import pprint
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'src'))
@@ -49,6 +49,12 @@ import webserver
 import optimade
 from parse import parse_optimade_filter, ParserSyntaxError
 
+def handler(signum, frame):
+    print('Shutting down on signal',signum)
+    exit(0)
+
+signal.signal(signal.SIGINT, handler)
+    
 def _json_format(response):
     return json.dumps(response, indent=4, separators=(',', ': '), sort_keys=True)
 

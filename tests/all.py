@@ -30,12 +30,15 @@ import unittest
 import test_python_version
 import test_parser
 import test_optimade
+import test_serve
 
 suite = unittest.TestLoader().loadTestsFromTestCase(test_python_version.TestPythonVer)
 
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParserExamples))
 
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_optimade.TestOptimadeExamples))
+
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve.TestServe))
 
 unittest.TextTestRunner(verbosity=2).run(suite)
 
