@@ -52,7 +52,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
     debug = False
     netloc = 'http://localhost'
     basepath = '/'
-    
+
     def get_debug_info(self):
         parsed_path = urlsplit(self.path)
         debug_info = {
@@ -73,11 +73,9 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         }
         return debug_info
 
-    
     def wfile_write_encoded(self, s, encoding='utf-8'):
         self.wfile.write(codecs.encode(s, encoding))
 
-        
     def do_GET(self):
 
         parsed_path = urlsplit(self.path)        
@@ -91,7 +89,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         basepath = self.basepath
         if basepath[0] == '/':
             basepath = basepath[1:]        
-        
+
         if not parsed_path.path.startswith(self.basepath):
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
@@ -101,20 +99,20 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
 
         relpath = relpath[len(basepath):]        
         representation = urlunsplit(('', '', relpath, parsed_path.query, ''))
-            
-        request = {'url':self.path,
-                   'scheme':parsed_path.scheme,
-                   'netloc':parsed_path.netloc,
-                   'path':parsed_path.path,
-                   'querystr':parsed_path.query,
-                   'port':parsed_path.port,                   
-                   'baseurl':self.netloc+self.basepath,
-                   'representation':representation,
-                   'relpath':relpath,
-                   'query':query,
-                   'postvars':{},
-                   'headers':self.headers}
-            
+
+        request = {'url': self.path,
+                   'scheme': parsed_path.scheme,
+                   'netloc': parsed_path.netloc,
+                   'path': parsed_path.path,
+                   'querystr': parsed_path.query,
+                   'port': parsed_path.port,                   
+                   'baseurl': self.netloc+self.basepath,
+                   'representation': representation,
+                   'relpath': relpath,
+                   'query': query,
+                   'postvars': {},
+                   'headers': self.headers}
+
         try:
             for callback in self.get_callbacks:
                 output = callback(request)
@@ -147,7 +145,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             postvars = dict(parse_qsl(self.rfile.read(length), keep_blank_values=True))
         else:
             postvars = {}
-            
+
         parsed_path = urlsplit(self.path)
 
         # Figure out what part of the URL is part of netloc and basepath used for hosting, and the rest (=representation)
@@ -158,7 +156,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         basepath = self.basepath
         if basepath[0] == '/':
             basepath = basepath[1:]        
-        
+
         if not parsed_path.path.startswith(self.basepath):
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
@@ -169,32 +167,32 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         relpath = relpath[len(basepath):]        
         representation = urlunsplit(('', '', relpath, parsed_path.query, ''))
 
-        request = {'url':self.path,
-                   'scheme':parsed_path.scheme,
-                   'netloc':parsed_path.netloc,
-                   'path':parsed_path.path,
-                   'querystr':parsed_path.query,
-                   'port':parsed_path.port,
-                   'baseurl':self.netloc+self.basepath,
-                   'representation':representation,
-                   'relpath':relpath,
-                   'query':query,
-                   'postvars':postvars,
-                   'headers':self.headers}                
-            
+        request = {'url': self.path,
+                   'scheme': parsed_path.scheme,
+                   'netloc': parsed_path.netloc,
+                   'path': parsed_path.path,
+                   'querystr': parsed_path.query,
+                   'port': parsed_path.port,
+                   'baseurl': self.netloc+self.basepath,
+                   'representation': representation,
+                   'relpath': relpath,
+                   'query': query,
+                   'postvars': postvars,
+                   'headers': self.headers}                
+
         try:
             for callback in self.post_callbacks:
                 output = callback(request)
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()
-            self.wfile_write_encoded(output['content'],output['encoding'])
+            self.wfile_write_encoded(output['content'], output['encoding'])
 
         except WebError as e:
             self.send_response(e.response_code, e.response_msg)
             self.send_header('Content-type', e.content_type)
             self.end_headers()
-            self.wfile_write_encoded(e.content,e.encoding)
+            self.wfile_write_encoded(e.content, e.encoding)
 
         except Exception as e:
             self.send_response(500)

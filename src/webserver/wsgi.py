@@ -37,7 +37,7 @@ except ImportError:
 def wsgi_get_request(environ):
 
     request = {}
-    
+
     request['headers'] = dict((x[5:], environ[x]) for x in environ if x.startswith("_HTTP_"))
 
     if 'REQUEST_METHOD' not in environ:
@@ -73,21 +73,21 @@ def wsgi_get_request(environ):
 
         if environ['wsgi.url_scheme'] == 'https':
             if environ['SERVER_PORT'] != '443':
-               request['netloc'] += ':' + environ['SERVER_PORT']
+                request['netloc'] += ':' + environ['SERVER_PORT']
         else:
             if environ['SERVER_PORT'] != '80':
-               request['netloc'] += ':' + environ['SERVER_PORT']
+                request['netloc'] += ':' + environ['SERVER_PORT']
 
-    request['baseurl'] = urlunsplit((request['scheme'],request['netloc'],environ.get('SCRIPT_NAME', ''),'',''))
-    request['relpath']= environ['PATH_INFO']
-    
-    request['querystr']= environ['QUERY_STRING']
+    request['baseurl'] = urlunsplit((request['scheme'], request['netloc'], environ.get('SCRIPT_NAME', ''), '', ''))
+    request['relpath'] = environ['PATH_INFO']
+
+    request['querystr'] = environ['QUERY_STRING']
 
     request['representation'] = urlunsplit(('', '', request['relpath'], request['querystr'], ''))
     request['url'] = urlunsplit((request['scheme'], request['netloc'], request['relpath'], request['querystr'], ''))
 
     return request
-    
+
 #def wsgi_get_relpath(environ):
 #    if 'PATH_INFO' in environ:
 #        return environ['PATH_INFO']

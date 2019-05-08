@@ -58,21 +58,21 @@ database_collection_mapper = {
 
 
 class Results(object):
-    def __init__(self, request, limit = None):
+    def __init__(self, request, limit=None):
         self.request = request
         self.queries = request['queries']
         self.projection = request['projection']
         self.limit = limit
-        
+
         self.count = 0
         self.more_data_available = True
         self.cur = None
 
         self.results = self.results_generator()
-        
+
     def results_generator(self):
         inv_collection_mapper = dict((database_collection_mapper[k], k) for k in database_collection_mapper)
-         
+
         count = 0
         for query in self.queries:
             if query['type'] == 'find':
@@ -84,15 +84,14 @@ class Results(object):
                     if self.limit is not None and count > self.limit+1:
                         return
                     rm = optimade_results_mapper[coll]
-                    rowdict = dict((inv_field_map[k],rm[k](row[k])) if k in rm else (inv_field_map[k],row[k]) for k in row)
+                    rowdict = dict((inv_field_map[k], rm[k](row[k])) if k in rm else (inv_field_map[k], row[k]) for k in row)
                     rowdict['type'] = coll
                     yield rowdict
                 del result
-                
+
             else:
                 raise Exception("backend/example_mongodb: execute_query: unknown query type")
-        
-        
+
     def __iter__(self):
         return self
 
@@ -102,13 +101,13 @@ class Results(object):
         except StopIteration:
             self.more_data_available = False
             raise StopIteration
-            
+
         if self.limit is not None and self.count == self.limit:
             self.more_data_available = True
             raise StopIteration
 
         self.count += 1
-        
+
         return result
 
     # Python 2 compability
@@ -116,10 +115,9 @@ class Results(object):
         return self.__next__()
 
 
-
-def initialize(db = None):
+def initialize(db=None):
     global database
-    
+
     if db is None:
         database = default_database.Database()
     else:
@@ -130,7 +128,7 @@ def initialize(db = None):
 def execute_query(collections, response_fields, response_limit, optimade_filter_ast=None, debug=False):
 
     request = optimade_filter_to_mongodb('3.6', optimade_filter_ast, collections, response_fields, database_collection_mapper, database_field_mapper, response_limit)
-    
+
     if debug:
         print("==== MONGODB QUERIES:")
         print(request)
@@ -150,7 +148,7 @@ def _setup_test_data():
     teststructs = get_test_structures()
 
     structs = []
-    
+
     for teststruct in teststructs:
 
         struct = {}
@@ -165,7 +163,7 @@ def _setup_test_data():
 
         structs += [struct]
 
-    database.insert_many('test_structures',structs)
+    database.insert_many('test_structures', structs)
 
     calcs = [
         {'_id': 'calc-1', 'local_id': 'calc-1', 'modification_date': '2019-03-21 23:45'},
@@ -177,11 +175,13 @@ def _setup_test_data():
         {'_id': 'calc-7', 'local_id': 'calc-7', 'modification_date': '2019-03-27 23:45'}
     ]
 
-    database.insert_many('test_calculations',calcs)
+    database.insert_many('test_calculations', calcs)
+
 
 def elements_result_handler(elements):
     return ",".join(elements)
-    
+
+
 optimade_results_mapper = {
     'structures': {
         'elements': elements_result_handler,

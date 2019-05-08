@@ -29,33 +29,32 @@ import pymongo
 import threading
 
 
-
 class Database(object): 
 
     def __init__(self):
         self.client = pymongo.MongoClient()
         self.db = self.client.optimade_test
-        
+
     def empty_database(self):
         self.client.drop_database("optimade_test")
         self.db = self.client.optimade_test
-        
-    def collection_destroy_if_exists(self,coll):
+
+    def collection_destroy_if_exists(self, coll):
         self.db[coll].remove({})
         if coll in self.db.list_collection_names():
             self.db[coll].drop()
-    
-    def insert(self,coll,data):
+
+    def insert(self, coll, data):
         self.db[coll].insert_one(data)
 
-    def insert_many(self,coll,datas):
+    def insert_many(self, coll, datas):
         try:
             x = self.db[coll].insert_many(datas)
         except pymongo.errors.BulkWriteError as e:
             print(e.details)
             raise
-            
-    def find(self,coll,query,projection=None, limit = None):
+
+    def find(self, coll, query, projection=None, limit=None):
         if projection is None or projection == []:
             if limit is None:
                 return self.db[coll].find(query)
@@ -63,13 +62,13 @@ class Database(object):
                 return self.db[coll].find(query).limit(limit)
         else:
             if limit is None:
-                return self.db[coll].find(query,dict([(x,1) for x in projection]))
+                return self.db[coll].find(query, dict([(x, 1) for x in projection]))
             else:
-                return self.db[coll].find(query,dict([(x,1) for x in projection])).limit(limit)
+                return self.db[coll].find(query, dict([(x, 1) for x in projection])).limit(limit)
 
-    def find_one(self,coll,query):
+    def find_one(self, coll, query):
         return self.db[coll].find_one(query)    
-            
+
     def close(self):
         self.client.close()
 

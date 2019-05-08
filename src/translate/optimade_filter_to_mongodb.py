@@ -36,11 +36,12 @@ from .error import TranslatorError
 
 supported_dialects = ['3.6']
 
+
 def optimade_filter_to_mongodb(dialect, filter_ast, entries, response_fields, collection_mapper, fields_mapper, response_limit):
 
     if dialect not in supported_dialects:
         raise Exception("optimade_filter_to_mongodb: Requested dialect is not supported: "+str(dialect))
-    
+
     projection = set(response_fields)
     queries = []
 
@@ -49,11 +50,13 @@ def optimade_filter_to_mongodb(dialect, filter_ast, entries, response_fields, co
             query = optimade_filter_to_mongodb_recurse(filter_ast, fields_mapper[entry], optimade_valid_fields_per_entry[entry])
         else:
             query = {}            
-        queries += [{'query':query, 'collection':collection_mapper[entry], 'type':'find'}]
+        queries += [{'query': query, 'collection': collection_mapper[entry], 'type':'find'}]
 
-    return {'queries': queries, 'projection':list(projection), 'limit': response_limit}
+    return {'queries': queries, 'projection': list(projection), 'limit': response_limit}
 
-_opmap = {'!=': '$ne', '>': '$gt', '<': '$lt', '=': '$eq', '<=': '$lte', '>=': '$gte', 'AND':'$and', 'OR':'$or', 'NOT':'$not'}    
+
+_opmap = {'!=': '$ne', '>': '$gt', '<': '$lt', '=': '$eq', '<=': '$lte', '>=': '$gte', 'AND': '$and', 'OR': '$or', 'NOT': '$not'}    
+
 
 def optimade_filter_to_mongodb_recurse(node, fields_mapper, fields_handlers, recursion=0):
 
@@ -66,8 +69,8 @@ def optimade_filter_to_mongodb_recurse(node, fields_mapper, fields_handlers, rec
             }
         }
     elif node[0] in ['NOT']:
-        query = { '$not':optimade_filter_to_mongodb_recurse(node[1], fields_mapper, fields_handlers, recursion=recursion+1)
-            }
+        query = {'$not': optimade_filter_to_mongodb_recurse(node[1], fields_mapper, fields_handlers, recursion=recursion+1)
+                 }
     elif node[0] in ['>', '>=', '<', '<=', '=', '!=']:
         op = node[0]
         left = node[1]
@@ -88,7 +91,7 @@ def optimade_filter_to_mongodb_recurse(node, fields_mapper, fields_handlers, rec
         pprint(node)
         raise TranslatorError("Unexpected translation error", 500, "Internal server error.")
     return query
-    
+
 
 def string_handler(field, op, value):
     op = _opmap[op]
@@ -101,6 +104,7 @@ def integer_handler(field, op, value):
     value = value[1:-1]
     return {field: {op: value}}
 
+
 def elements_handler(field, op, value):
 
     if op != '=':
@@ -109,9 +113,11 @@ def elements_handler(field, op, value):
     segments = []
     value = value[1:-1]
     elements = [x.strip() for x in value.split(",")]
-    return {field: {'$all':elements}}
+    return {field: {'$all': elements}}
 
 # Assumes the formula is stored according to element name in the database
+
+
 def chemical_formula_handler(field, op, value):
 
     if op != '=':
@@ -121,6 +127,7 @@ def chemical_formula_handler(field, op, value):
     segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', value))
     sorted_formula = "".join(segments)
     return {field: {'$eq': sorted_formula}}
+
 
 def formula_prototype_handler(field, op, value):
 
@@ -138,7 +145,8 @@ def formula_prototype_handler(field, op, value):
 
 def unknown_types_handler(val1, op, val2):
     op = _opmap[op]
-    return {'$expr': { op: [val1, val2] } }
+    return {'$expr': {op: [val1, val2]}}
+
 
 optimade_valid_fields_per_entry = {
     'structures': {

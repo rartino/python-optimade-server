@@ -65,7 +65,7 @@ def process(request, query_function, debug=False):
                       returns an OptimadeResults object.
 
     """
-    
+
     if debug:
         print("==== OPTIMADE REQUEST FOR:", request['representation'])
 
@@ -78,8 +78,8 @@ def process(request, query_function, debug=False):
 
     if debug:
         print("==== VALIDATED ENDPOINT, REQUEST_ID, AND PARAMETERS:")
-        print("ENDPOINT:",endpoint)
-        print("REQUEST_ID:",request_id)
+        print("ENDPOINT:", endpoint)
+        print("REQUEST_ID:", request_id)
         pprint(validated_parameters)
         print("====")
 

@@ -42,7 +42,7 @@ def _validate_query(endpoint, query):
         raise OptimadeError("Requested response_format not supported.", 400, "Bad request")
     else:
         validated_parameters['response_format'] = 'jsonapi'
-    
+
     if 'response_limit' in query and query['response_limit'] is not None:
         try:
             validated_parameters['response_limit'] = int(query['response_limit'])
@@ -65,7 +65,7 @@ def _validate_query(endpoint, query):
 
 
 def validate_optimade_request(request):
-    validated_request = {'baseurl':request['baseurl'], 'representation':request['representation'], 'endpoint': None, 'version': optimade_default_version, 'request_id':None, 'query':None}
+    validated_request = {'baseurl': request['baseurl'], 'representation': request['representation'], 'endpoint': None, 'version': optimade_default_version, 'request_id': None, 'query': None}
 
     if 'endpoint' in request:
         validated_request['endpoint'] = request['endpoint']
@@ -73,13 +73,13 @@ def validate_optimade_request(request):
         validated_request['request_id'] = request['request_id']
     if 'version' in request:
         validated_request['version'] = request['version']
-        
+
     if validated_request['endpoint'] is None:
         if 'relurl' in request:
             relurl = request['relurl']
         else:
             relurl = request['representation'].partition('?')[0]
-            
+
         endpoint = relurl.strip("/")
 
         potential_optimade_version, _sep, rest = endpoint.partition('/')    
@@ -121,5 +121,5 @@ def validate_optimade_request(request):
         query = dict(parse_qsl(querystr, keep_blank_values=True))
 
     validated_request['query'] = _validate_query(validated_request['endpoint'], query)
-                
+
     return validated_request

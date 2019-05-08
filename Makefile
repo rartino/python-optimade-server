@@ -67,6 +67,12 @@ link_python3:
 	if [ ! -e tests/python_versions/ver3 ]; then mkdir tests/python_versions/ver3; fi
 	if [ ! -e tests/python_versions/ver3/python ]; then ln -sf /usr/bin/python3 tests/python_versions/ver3/python; fi
 
+relink_python:
+	rm -f tests/python_versions/ver2/python
+	rmdir tests/python_versions/ver2
+	rm -f tests/python_versions/ver3/python
+	rmdir tests/python_versions/ver3
+
 # Make git describe version PEP 440 compliant
 GENERATE_VERSION:
 	git describe --always --dirty | sed 's/^v\(.*\)/\1/' | sed 's/-/.dev/' | sed 's/-/+/' | sed 's/-dirty/.d/' > VERSION

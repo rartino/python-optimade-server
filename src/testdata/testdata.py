@@ -28,6 +28,7 @@ from __future__ import print_function
 
 import os, json, pprint, re, math, datetime
 
+
 def int_to_anonymous_symbol(i):
     bigletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     smalletters = "abcdefghijklmnopqrstuvwxyz"
@@ -37,8 +38,9 @@ def int_to_anonymous_symbol(i):
     low = i % 26
     return bigletters[high]+smalletters[low]
 
+
 class OptimadeStructure(object):
-    def __init__(self, id, lattice_vectors, cartesian_site_positions, species_at_sites, species, assemblies = None,  chemical_formula = None, cifdata = None, cifheader = None, local_id = None, modification_date = None):
+    def __init__(self, id, lattice_vectors, cartesian_site_positions, species_at_sites, species, assemblies=None, chemical_formula=None, cifdata=None, cifheader=None, local_id=None, modification_date=None):
 
         self.id = id
         if local_id is not None:
@@ -53,25 +55,25 @@ class OptimadeStructure(object):
         self.assemblies = assemblies
         self.cifdata = cifdata
         self.cifheader = cifheader
-        
+
         formula_components = {}
         for entry in species_at_sites:
-            for element, occupancy in zip(species[entry]['chemical_symbols'],species[entry]['concentration']):
+            for element, occupancy in zip(species[entry]['chemical_symbols'], species[entry]['concentration']):
                 if element in formula_components:
                     formula_components[element] += occupancy
                 else:
                     formula_components[element] = occupancy
         self.nelements = len(formula_components)
         self.elements = ",".join(formula_components.keys())
-        
+
         if chemical_formula is not None:
             self.chemical_formula = chemical_formula
         else:
             formula_components_order = sorted(formula_components, key=formula_components.get)
             self.chemical_formula = "".join([x + "%g" % formula_components[x] for x in formula_components_order])
 
-        prototype_formula_components = re.findall('([A-Z][a-z]?)([0-9.]*)',self.chemical_formula)
-        prototype_formula_components = sorted([(float(occ),occ) if occ != '' else (1.0,'') for el,occ in prototype_formula_components])
+        prototype_formula_components = re.findall('([A-Z][a-z]?)([0-9.]*)', self.chemical_formula)
+        prototype_formula_components = sorted([(float(occ), occ) if occ != '' else (1.0, '') for el, occ in prototype_formula_components])
         prototype_formula_components = [int_to_anonymous_symbol(i)+prototype_formula_components[i][1] for i in range(len(prototype_formula_components))]
         self.formula_prototype = "".join(prototype_formula_components)
 
@@ -96,24 +98,28 @@ class OptimadeStructure(object):
             "local_id="+repr(self.local_id),
             "modification_date="+repr(self.modification_date)])+")"
 
-            
-json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'json')
+
+json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'json')
+
 
 def str_to_float(x):
-    return float(x.replace('(','').replace(')',''))
+    return float(x.replace('(', '').replace(')', ''))
+
 
 def json_to_struct(data):
 
-    return OptimadeStructure("testdata:"+data['id'],data['lattice_vectors'], data['cartesian_site_positions'], data['species_at_sites'], data['species'], data['assemblies'], cifdata=data['cif'],cifheader=data['cif_header'])
-    
+    return OptimadeStructure("testdata:"+data['id'], data['lattice_vectors'], data['cartesian_site_positions'], data['species_at_sites'], data['species'], data['assemblies'], cifdata=data['cif'], cifheader=data['cif_header'])
+
+
 def get_test_structures():
     structs = []
     for f in os.listdir(json_path):
         if f.endswith(".json"):
-            with open(os.path.join(json_path,f),'r') as inf:
+            with open(os.path.join(json_path, f), 'r') as inf:
                 data = json.load(inf)
                 structs += [json_to_struct(data)]
     return structs
+
 
 if __name__ == "__main__":
     structs = get_test_structures()

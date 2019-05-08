@@ -42,7 +42,7 @@ def generate_info_endpoint_reply(request):
     response = {
         "links": {
             "base_url": request['baseurl']
-            },
+        },
         "data": [
             {
                 "type": "info",
@@ -75,7 +75,7 @@ def generate_info_endpoint_reply(request):
             "time_stamp": datetime.datetime.now().isoformat(),
             "data_returned": 0,
             "more_data_available": False,
-         }
+        }
     }
     return response
 
@@ -85,7 +85,7 @@ def generate_entry_info_endpoint_reply(request, entry):
     return {
         "links": {
             "base_url": request['baseurl']
-            },
+        },
         "data": [
             entry_info[entry]
         ],
@@ -97,7 +97,7 @@ def generate_entry_info_endpoint_reply(request, entry):
             "time_stamp": datetime.datetime.now().isoformat(),
             "data_returned": 0,
             "more_data_available": False,
-         }        
+        }        
     }
 
 
@@ -106,7 +106,7 @@ def generate_base_endpoint_reply(request):
     return {
         "links": {
             "base_url": request['baseurl']
-            },
+        },
         "data": [
             {
                 "type": "OPTIMaDe base url",
@@ -126,6 +126,6 @@ def generate_base_endpoint_reply(request):
             "time_stamp": datetime.datetime.now().isoformat(),
             "data_returned": 0,
             "more_data_available": False,
-         }        
+        }        
     }
 

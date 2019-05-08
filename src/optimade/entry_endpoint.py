@@ -27,6 +27,7 @@
 
 import datetime
 
+
 def generate_entry_endpoint_reply(request, data):
     """
     This just returns a hardcoded introspection string.
@@ -58,12 +59,12 @@ def generate_entry_endpoint_reply(request, data):
             "time_stamp": datetime.datetime.now().isoformat(),
             "data_returned": len(data_part),
             "more_data_available": data.more_data_available,
-         }        
+        }        
     }
 
     # TODO: Add 'next' element in links for pagination, via info propagated in data
     #   Add "data_available" if available in data
     #   Fix more_data_available
-    
+
     return response
 

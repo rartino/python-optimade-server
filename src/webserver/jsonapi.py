@@ -30,18 +30,19 @@ import json
 from .serve import WebError
 
 _jsonapi_response_codes = {
-    '200':'OK',
-    '201':'Created',
-    '202':'Accepted',
-    '204':'No Content',
-    '403':'Forbidden',
-    '400':'Bad Request',
-    '404':'Not Found',
-    '406':'Not Acceptable',
-    '409':'Conflict',
-    '415':'Unsupported Media Type',
-    '500':'Internal Server Error'
+    '200': 'OK',
+    '201': 'Created',
+    '202': 'Accepted',
+    '204': 'No Content',
+    '403': 'Forbidden',
+    '400': 'Bad Request',
+    '404': 'Not Found',
+    '406': 'Not Acceptable',
+    '409': 'Conflict',
+    '415': 'Unsupported Media Type',
+    '500': 'Internal Server Error'
 }
+
 
 class JsonapiError(WebError):
     def __init__(self, message, response_code, response_msg=None, longmsg=None, idstr=None, links=None, code=None, source=None, meta=None, indent=True):
@@ -56,9 +57,9 @@ class JsonapiError(WebError):
         self.source = source
         self.meta = meta
         self.indent = indent
-        
+
         errordata = {}
-        
+
         if idstr is not None:
             errordata['id'] = idstr
 
@@ -75,16 +76,16 @@ class JsonapiError(WebError):
         errordata['title'] = str(self.response_msg)
         errordata['detail'] = str(self.content)
 
-        self.content_json = {'errors':errordata}
+        self.content_json = {'errors': errordata}
 
         if indent:
             message = json.dumps(self.content_json, indent=4, separators=(',', ': '), sort_keys=True)
         else:
             message = json.dumps(self.content_json, separators=(',', ': '), sort_keys=True)
 
-            
         super(JsonapiError, self).__init__(message, response_code, response_msg, longmsg, self.content_type)
-        
+
+
 def check_jsonapi_header_requirements(headers):
     # Handle jsonapi MUSTs with regards to headers
     if 'Content-Type' in headers:

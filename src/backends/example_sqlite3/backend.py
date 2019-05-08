@@ -56,26 +56,27 @@ database_table_mapper = {
     'calculations': 'test_calculations'
 }
 
+
 class Results(object):
     def __init__(self, cur, limit):
         self.cur = cur
         self.limit = limit
         self.count = 0
         self.more_data_available = True
-        
+
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
             row = next(self.cur)
-            result = dict([(name[0],d) for name,d in zip(self.cur.description, row)])
+            result = dict([(name[0], d) for name, d in zip(self.cur.description, row)])
         except StopIteration:
             self.more_data_available = False
             self.cur.close()
             self.cur = None
             raise StopIteration
-            
+
         if self.limit is not None and self.count == self.limit:
             self.more_data_available = True
             self.cur.close()
@@ -83,21 +84,21 @@ class Results(object):
             raise StopIteration
 
         self.count += 1
-        
+
         return result
 
     def __del__(self):
         if self.cur is not None:
             self.cur.close()
-    
+
     # Python 2 compability
     def next(self):
         return self.__next__()
 
 
-def initialize(db = None):
+def initialize(db=None):
     global database
-    
+
     if db is None:
         database = default_database.Database()
     else:
@@ -127,14 +128,14 @@ def execute_query(entries, response_fields, response_limit, optimade_filter_ast=
 
     # Run the query    
     results = database.execute(sql, parameters, response_limit)
-    
+
     #if debug:
     #    print("==== SQL QUERY RESULT:")
     #    print("Number of results found:", len(results))
     #    for row in results:
     #        print(row)
 
-    return Results(results,response_limit)
+    return Results(results, response_limit)
 
 
 def close():
@@ -146,7 +147,7 @@ def _setup_test_data():
     database.execute("create table structures (id, local_id, modification_date, elements, nelements, chemical_formula, formula_prototype)")
 
     teststructs = get_test_structures()
-    
+
     for teststruct in teststructs:
 
         struct = {}
@@ -155,7 +156,7 @@ def _setup_test_data():
         struct['local_id'] = teststruct.id
         struct['modification_date'] = teststruct.modification_date
         struct['nelements'] = teststruct.nelements
-        
+
         segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', teststruct.chemical_formula))
         struct['chemical_formula'] = "".join(segments)
 
