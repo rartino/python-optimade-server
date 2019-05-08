@@ -64,7 +64,7 @@ def request_callback(request):
     except optimade.OptimadeError as e:
         raise webserver.JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
     
-    return {'content': _json_format(response), 'content_type':'application/vnd.api+json', 'response_code':200, 'response_msg':'OK'}
+    return {'content': _json_format(response), 'content_type':'application/vnd.api+json', 'response_code':200, 'response_msg':'OK', 'encoding':'utf-8'}
 
 
 if __name__ == "__main__":

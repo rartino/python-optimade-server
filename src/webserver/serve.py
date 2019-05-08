@@ -36,12 +36,13 @@ except ImportError:
 
 
 class WebError(Exception):
-    def __init__(self, message, response_code, response_msg, longmsg=None, content_type='text/plain'):
+    def __init__(self, message, response_code, response_msg, longmsg=None, content_type='text/plain', encoding='utf-8'):
         super(WebError, self).__init__(message)
         self.content = longmsg if longmsg is not None else message
         self.response_code = response_code
         self.response_msg = response_msg
         self.content_type = content_type
+        self.encoding = encoding
 
 
 class _CallbackRequestHandler(BaseHTTPRequestHandler):
@@ -72,9 +73,11 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         }
         return debug_info
 
-    def wfile_write_encoded(self, s):
-        self.wfile.write(codecs.encode(s, 'utf-8'))
+    
+    def wfile_write_encoded(self, s, encoding='utf-8'):
+        self.wfile.write(codecs.encode(s, encoding))
 
+        
     def do_GET(self):
 
         parsed_path = urlsplit(self.path)        
@@ -118,13 +121,13 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()
-            self.wfile_write_encoded(output['content'])
+            self.wfile_write_encoded(output['content'], output['encoding'])
 
         except WebError as e:
             self.send_response(e.response_code, e.response_msg)
             self.send_header('Content-type', e.content_type)
             self.end_headers()
-            self.wfile_write_encoded(e.content)
+            self.wfile_write_encoded(e.content, e.encoding)
 
         except Exception as e:
             self.send_response(500)
@@ -185,13 +188,13 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()
-            self.wfile_write_encoded(output['content'])
+            self.wfile_write_encoded(output['content'],output['encoding'])
 
         except WebError as e:
             self.send_response(e.response_code, e.response_msg)
             self.send_header('Content-type', e.content_type)
             self.end_headers()
-            self.wfile_write_encoded(e.content)
+            self.wfile_write_encoded(e.content,e.encoding)
 
         except Exception as e:
             self.send_response(500)
