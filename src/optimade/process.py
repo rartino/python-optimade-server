@@ -24,11 +24,12 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import print_function
 
 from pprint import pprint
 
 from .entries import all_entries, valid_response_fields
-from .validate import validate_query, validate_request
+from .validate import validate_optimade_request
 from .info_endpoint import generate_info_endpoint_reply, generate_entry_info_endpoint_reply, generate_base_endpoint_reply
 from .entry_endpoint import generate_entry_endpoint_reply
 from .error import OptimadeError
@@ -36,19 +37,44 @@ from parse import ParserSyntaxError, parse_optimade_filter
 from translate import TranslatorError
 
 
-def process(baseurl, relurl_or_request, query, query_function, debug=False):
+def process(request, query_function, debug=False):
+    """
+    Process an optimade query.
 
+    Args:
+      request: a dict with these entries: 
+                   baseurl (required): the base url that serves the OPTIMaDe API. 
+                   representation (mandatory): the string with the part of the URL that follows the base URL. This must always be provided, because
+                        the OPTIMaDe specification requires this to be part of the output in the meta section (meta -> query -> representation).
+                   relurl (optional): the part of the URL that follows the base URL but without query parameters.
+                        Include this if the web-serving framework provides this, i.e., if it splits off the query part for you.
+                   endpoint (optional): the endpoint being requested 
+                   request_id (optional): a specific entry id being requested.
+                   querystr (optional): a string that defines the query parameters that follows the base URL and the relurl and a single '?'.   
+                   query (optional): a dictionary representation of the query part of the URL.   
+          missing information is derived from the 'representation' string.
+
+      query_function: a callback function of signature
+                         query_function(entries, response_fields, response_limit, filter_ast, debug)
+                      with:
+                         entries: list of optimade entries to run the query for, usually just the entry type requested by the end point.
+                         response_fields: which fields should be present in the output
+                         response_limit: the maximum number of results to return
+                         filter_ast: an abstract syntax tree representing the optimade filter requested
+                         debug: if set to true, print debug information to stdout.
+                      returns an OptimadeResults object.
+
+    """
+    
     if debug:
-        print("==== OPTIMADE REQUEST FOR:", relurl_or_request, "WITH PARAMETERS:")
-        pprint(query)
-        print("====")
+        print("==== OPTIMADE REQUEST FOR:", request['representation'])
 
-    validated_request = validate_request(relurl_or_request)
+    validated_request = validate_optimade_request(request)
+    baseurl = validated_request['baseurl']
     endpoint = validated_request['endpoint']
     request_id = validated_request['request_id']
-    version = validated_request['version']
-        
-    validated_parameters = validate_query(endpoint, query)
+    version = validated_request['version']        
+    validated_parameters = validated_request['query']
 
     if debug:
         print("==== VALIDATED ENDPOINT, REQUEST_ID, AND PARAMETERS:")
@@ -58,10 +84,10 @@ def process(baseurl, relurl_or_request, query, query_function, debug=False):
         print("====")
 
     if endpoint == '':
-        response = generate_base_endpoint_reply()
+        response = generate_base_endpoint_reply(validated_request)
 
     elif endpoint == 'info':
-        response = generate_info_endpoint_reply(baseurl, version)
+        response = generate_info_endpoint_reply(validated_request)
 
     elif endpoint in all_entries or endpoint == 'all':
 
@@ -97,15 +123,15 @@ def process(baseurl, relurl_or_request, query, query_function, debug=False):
                 print("====")
 
             try:
-                result = query_function(entries, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
+                results = query_function(entries, response_fields, validated_parameters['response_limit'], filter_ast, debug=debug)
             except TranslatorError as e:
                 raise OptimadeError(str(e), e.response_code, e.response_msg)
 
-            response = generate_entry_endpoint_reply(result)
+            response = generate_entry_endpoint_reply(validated_request, results)
         else:
-            result = query_function(entries, response_fields, validated_parameters['response_limit'], debug=debug)
+            results = query_function(entries, response_fields, validated_parameters['response_limit'], debug=debug)
 
-            response = generate_entry_endpoint_reply(result)
+            response = generate_entry_endpoint_reply(validated_request, results)
 
         if debug:
             print("==== END RESULT")
@@ -116,7 +142,7 @@ def process(baseurl, relurl_or_request, query, query_function, debug=False):
         base, _sep, info = endpoint.rpartition("/")
         assert(info == "info")
         if base in all_entries:
-            response = generate_entry_info_endpoint_reply(base)            
+            response = generate_entry_info_endpoint_reply(validated_request, base)            
         else:
             raise OptimadeError("Internal error: unexpected endpoint.", 500, "Internal server error")
 

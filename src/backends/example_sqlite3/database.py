@@ -27,19 +27,24 @@
 
 import sqlite3
 import threading
-
+           
 class Database(object): 
 
     def __init__(self):
         self.threadlocal = threading.local()
         self.threadlocal.con = sqlite3.connect(":memory:")    
-        self.threadlocal.cur = self.threadlocal.con.cursor()
 
-    def execute(self,sql, parameters={}):
-        if hasattr(self.threadlocal,'cur'):
-            results = self.threadlocal.cur.execute(sql, parameters) 
-            data = [dict([(name[0],d) for name,d in zip(results.description, row)]) for row in results]
-            return data
+    def execute(self, sql, parameters={}, limit=None):
+        if hasattr(self.threadlocal,'con'):
+            cur = self.threadlocal.con.cursor()
+            if limit is not None:
+                # Ask for limit + 1, so that the result set can know if there is more data available than was returned
+                results = cur.execute(sql + "LIMIT "+str(limit+1), parameters) 
+            else:
+                results = cur.execute(sql, parameters) 
+            #data = [dict([(name[0],d) for name,d in zip(results.description, row)]) for row in results]
+            #return data
+            return results
         else:
             raise Exception("Trying to access in-memory database across threads.")
 
@@ -50,8 +55,7 @@ class Database(object):
             raise Exception("Trying to access in-memory database across threads.")
             
     def close(self):
-        if hasattr(self.threadlocal,'cur'):        
-            self.threadlocal.cur.close()
+        if hasattr(self.threadlocal,'con'):        
             self.threadlocal.con.close()
         else:
             raise Exception("Trying to access in-memory database across threads.")        

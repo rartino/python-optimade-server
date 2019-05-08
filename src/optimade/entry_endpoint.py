@@ -25,8 +25,9 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import datetime
 
-def generate_entry_endpoint_reply(data):
+def generate_entry_endpoint_reply(request, data):
     """
     This just returns a hardcoded introspection string.
     """
@@ -42,7 +43,27 @@ def generate_entry_endpoint_reply(data):
             'type': d['type'],
         }]
 
-    response = {"data": data_part}
+    response = {
+        "links": {
+            "base_url": request['baseurl'],
+            # Pagination not supported yet (which is OK according to specification)
+            "next": None
+        },
+        "data": data_part,
+        "meta": {
+            "query": {
+                "representation": request['representation']
+            },
+            "api_version": request['version'],
+            "time_stamp": datetime.datetime.now().isoformat(),
+            "data_returned": len(data_part),
+            "more_data_available": data.more_data_available,
+         }        
+    }
 
+    # TODO: Add 'next' element in links for pagination, via info propagated in data
+    #   Add "data_available" if available in data
+    #   Fix more_data_available
+    
     return response
 

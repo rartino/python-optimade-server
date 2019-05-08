@@ -49,18 +49,15 @@ import webserver
 import optimade
 from parse import parse_optimade_filter, ParserSyntaxError
 
-baseurl = None
-
 def _json_format(response):
     return json.dumps(response, indent=4, separators=(',', ': '), sort_keys=True)
 
+def request_callback(request):
 
-def request_callback(relurl, query, headers):
-
-    webserver.check_jsonapi_header_requirements(headers)
+    webserver.check_jsonapi_header_requirements(request['headers'])
     
     try:
-        response = optimade.process(baseurl, relurl, query, backend.execute_query, debug = True)
+        response = optimade.process(request, backend.execute_query, debug = True)
     except optimade.OptimadeError as e:
         raise webserver.JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
     
@@ -72,8 +69,9 @@ if __name__ == "__main__":
     import backends.example_sqlite3 as backend    
     
     backend.initialize()
-    baseurl = 'http://localhost:8080/'
-    webserver.startup(request_callback, port=8080, baseurl=baseurl, debug=True)
+    netloc = 'http://localhost:8080'
+    basepath = '/'
+    webserver.startup(request_callback, port=8080, netloc=netloc, basepath=basepath, debug=True)
     backend.close()
 
 

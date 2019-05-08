@@ -28,10 +28,10 @@ from __future__ import print_function
 import cgitb, sys, codecs, cgi
 
 try:
-    from urllib.parse import parse_qsl, urlparse
+    from urllib.parse import parse_qsl, urlsplit, urlunsplit
     from http.server import BaseHTTPRequestHandler, HTTPServer
 except ImportError:
-    from urlparse import parse_qsl, urlparse
+    from urlparse import parse_qsl, urlsplit, urlunsplit
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
@@ -49,9 +49,11 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
     get_callbacks = []
     post_callbacks = []
     debug = False
-
+    netloc = 'http://localhost'
+    basepath = '/'
+    
     def get_debug_info(self):
-        parsed_path = urlparse(self.path)
+        parsed_path = urlsplit(self.path)
         debug_info = {
             'CLIENT': {
                 'client_address=%s (%s)' % (self.client_address,
@@ -74,17 +76,45 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(codecs.encode(s, 'utf-8'))
 
     def do_GET(self):
-        parsed_path = urlparse(self.path)
 
-        relpath = parsed_path.path
+        parsed_path = urlsplit(self.path)        
         query = dict(parse_qsl(parsed_path.query, keep_blank_values=True))
 
+        # Figure out what part of the URL is part of netloc and basepath used for hosting, and the rest (=representation)
+        relpath = parsed_path.path
         if relpath[0] == '/':
             relpath = relpath[1:]
 
+        basepath = self.basepath
+        if basepath[0] == '/':
+            basepath = basepath[1:]        
+        
+        if not parsed_path.path.startswith(self.basepath):
+            self.send_response(404)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile_write_encoded("<html><body>Requested URL not found.</body></html>")            
+            return
+
+        relpath = relpath[len(basepath):]        
+        representation = urlunsplit(('', '', relpath, parsed_path.query, ''))
+            
+        request = {'url':self.path,
+                   'scheme':parsed_path.scheme,
+                   'netloc':parsed_path.netloc,
+                   'path':parsed_path.path,
+                   'querystr':parsed_path.query,
+                   'port':parsed_path.port,                   
+                   'baseurl':self.netloc+self.basepath,
+                   'representation':representation,
+                   'relpath':relpath,
+                   'query':query,
+                   'postvars':{},
+                   'headers':self.headers}
+            
         try:
             for callback in self.get_callbacks:
-                output = callback(relpath, query, self.headers)
+                output = callback(request)
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()
@@ -114,17 +144,44 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
             postvars = dict(parse_qsl(self.rfile.read(length), keep_blank_values=True))
         else:
             postvars = {}
+            
+        parsed_path = urlsplit(self.path)
 
-        parsed_path = urlparse(self.path)
-
+        # Figure out what part of the URL is part of netloc and basepath used for hosting, and the rest (=representation)
         relpath = parsed_path.path
-
         if relpath[0] == '/':
             relpath = relpath[1:]
 
+        basepath = self.basepath
+        if basepath[0] == '/':
+            basepath = basepath[1:]        
+        
+        if not parsed_path.path.startswith(self.basepath):
+            self.send_response(404)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile_write_encoded("<html><body>Requested URL not found.</body></html>")            
+            return
+
+        relpath = relpath[len(basepath):]        
+        representation = urlunsplit(('', '', relpath, parsed_path.query, ''))
+
+        request = {'url':self.path,
+                   'scheme':parsed_path.scheme,
+                   'netloc':parsed_path.netloc,
+                   'path':parsed_path.path,
+                   'querystr':parsed_path.query,
+                   'port':parsed_path.port,
+                   'baseurl':self.netloc+self.basepath,
+                   'representation':representation,
+                   'relpath':relpath,
+                   'query':query,
+                   'postvars':postvars,
+                   'headers':self.headers}                
+            
         try:
             for callback in self.post_callbacks:
-                output = callback(relpath, postvars, self.headers)
+                output = callback(request)
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
             self.end_headers()
@@ -146,18 +203,20 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
                 self.wfile_write_encoded("<html><body>An unexpected server error has occured.</body></html>")
 
 
-def startup(get_callback, post_callback=None, port=80, baseurl=None, debug=False):
+def startup(get_callback, post_callback=None, port=80, netloc=None, basepath='/', debug=False):
 
     if post_callback is None:
         post_callback = get_callback
 
-    if baseurl is None:
+    if netloc is None:
         if port == 80:
-            baseurl = "http://localhost/"
+            netloc = "http://localhost"
         else:
-            baseurl = "http://localhost:"+str(port)+"/"
+            netloc = "http://localhost:"+str(port)
 
     _CallbackRequestHandler.debug = debug
+    _CallbackRequestHandler.netloc = netloc
+    _CallbackRequestHandler.basepath = basepath
     _CallbackRequestHandler.get_callbacks += [get_callback]
     _CallbackRequestHandler.post_callbacks += [post_callback]
 

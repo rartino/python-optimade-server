@@ -56,6 +56,44 @@ database_table_mapper = {
     'calculations': 'test_calculations'
 }
 
+class Results(object):
+    def __init__(self, cur, limit):
+        self.cur = cur
+        self.limit = limit
+        self.count = 0
+        self.more_data_available = True
+        
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            row = next(self.cur)
+            result = dict([(name[0],d) for name,d in zip(self.cur.description, row)])
+        except StopIteration:
+            self.more_data_available = False
+            self.cur.close()
+            self.cur = None
+            raise StopIteration
+            
+        if self.limit is not None and self.count == self.limit:
+            self.more_data_available = True
+            self.cur.close()
+            self.cur = None
+            raise StopIteration
+
+        self.count += 1
+        
+        return result
+
+    def __del__(self):
+        if self.cur is not None:
+            self.cur.close()
+    
+    # Python 2 compability
+    def next(self):
+        return self.__next__()
+
 
 def initialize(db = None):
     global database
@@ -69,7 +107,8 @@ def initialize(db = None):
 
 def execute_query(entries, response_fields, response_limit, optimade_filter_ast=None, debug=False):
 
-    result = optimade_filter_to_sql('sqlite3', optimade_filter_ast, entries, response_fields, database_table_mapper, database_column_mapper, response_limit)
+    # Ask for one more row than required, that way we can fill out 'has_more_data'
+    result = optimade_filter_to_sql('sqlite3', optimade_filter_ast, entries, response_fields, database_table_mapper, database_column_mapper)
     sql, parameters = result['sql'], result['parameters']
 
     # Just to show the results on screen
@@ -87,15 +126,15 @@ def execute_query(entries, response_fields, response_limit, optimade_filter_ast=
         print("====")
 
     # Run the query    
-    results = database.execute(sql, parameters)
-
+    results = database.execute(sql, parameters, response_limit)
+    
     #if debug:
     #    print("==== SQL QUERY RESULT:")
     #    print("Number of results found:", len(results))
     #    for row in results:
     #        print(row)
 
-    return results
+    return Results(results,response_limit)
 
 
 def close():

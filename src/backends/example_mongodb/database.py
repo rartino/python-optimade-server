@@ -28,6 +28,8 @@
 import pymongo
 import threading
 
+
+
 class Database(object): 
 
     def __init__(self):
@@ -64,7 +66,7 @@ class Database(object):
                 return self.db[coll].find(query,dict([(x,1) for x in projection]))
             else:
                 return self.db[coll].find(query,dict([(x,1) for x in projection])).limit(limit)
-                
+
     def find_one(self,coll,query):
         return self.db[coll].find_one(query)    
             

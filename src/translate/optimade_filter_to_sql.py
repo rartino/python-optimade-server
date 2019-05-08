@@ -37,7 +37,7 @@ from .error import TranslatorError
 supported_dialects = ['sqlite3']
 
 
-def optimade_filter_to_sql(dialect, filter_ast, entries, response_fields, tables_mapper, columns_mapper, response_limit, indent=True):
+def optimade_filter_to_sql(dialect, filter_ast, entries, response_fields, tables_mapper, columns_mapper, indent=True):
 
     if dialect not in supported_dialects:
         raise Exception("optimade_filter_to_sql: Requested dialect is not supported: "+str(dialect))
@@ -77,8 +77,9 @@ def optimade_filter_to_sql(dialect, filter_ast, entries, response_fields, tables
 
     sqlstr = " UNION \n".join(sql_tbl_strs)
 
-    if response_limit is not None:
-        sqlstr += "LIMIT "+str(response_limit)+" \n"
+    #Let the caller handle limits instead, since that handling if far from trivial when there is possible pagination
+    #if response_limit is not None:
+    #    sqlstr += "LIMIT "+str(response_limit)+" \n"
 
     return {'sql': sqlstr, 'parameters': sql['parameters']}
 

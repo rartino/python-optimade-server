@@ -98,19 +98,17 @@ def _json_format(response):
 
 def app(environ, start_response):
 
-    headers = webserver.wsgi_get_headers(environ)
-    query = webserver.wsgi_get_query(environ)
-    relurl = webserver.wsgi_get_relurl(environ)
+    request = webserver.wsgi_get_request(environ)
     
-    webserver.check_jsonapi_header_requirements(headers)
+    webserver.check_jsonapi_header_requirements(request['headers'])
     
     try:
-        response = optimade.process(baseurl, relurl, query, backend.execute_query, debug = True)
+        response = optimade.process(request, backend.execute_query, debug = True)
     except optimade.OptimadeError as e:
         error = webserver.JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
         
         start_response(str(error.response_code) + " "+str(error.response_msg), [('Content-Type',error.content_type)])
-        return [error.content]
+        return [codecs.encode(error.content,'utf-8')]
 
     start_response('200 OK', [('Content-Type','application/vnd.api+json')])
     return [_json_format(response)]

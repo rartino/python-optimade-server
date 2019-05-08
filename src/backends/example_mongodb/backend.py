@@ -57,6 +57,66 @@ database_collection_mapper = {
 }
 
 
+class Results(object):
+    def __init__(self, request, limit = None):
+        self.request = request
+        self.queries = request['queries']
+        self.projection = request['projection']
+        self.limit = limit
+        
+        self.count = 0
+        self.more_data_available = True
+        self.cur = None
+
+        self.results = self.results_generator()
+        
+    def results_generator(self):
+        inv_collection_mapper = dict((database_collection_mapper[k], k) for k in database_collection_mapper)
+         
+        count = 0
+        for query in self.queries:
+            if query['type'] == 'find':
+                result = database.find(query['collection'], query['query'], self.projection, limit=((self.limit+1) if self.limit is not None else None))
+                coll = inv_collection_mapper[query['collection']]
+                inv_field_map = dict((database_field_mapper[coll][k], k) for k in database_field_mapper[coll])
+                for row in result:
+                    count += 1
+                    if self.limit is not None and count > self.limit+1:
+                        return
+                    rm = optimade_results_mapper[coll]
+                    rowdict = dict((inv_field_map[k],rm[k](row[k])) if k in rm else (inv_field_map[k],row[k]) for k in row)
+                    rowdict['type'] = coll
+                    yield rowdict
+                del result
+                
+            else:
+                raise Exception("backend/example_mongodb: execute_query: unknown query type")
+        
+        
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            result = next(self.results)
+        except StopIteration:
+            self.more_data_available = False
+            raise StopIteration
+            
+        if self.limit is not None and self.count == self.limit:
+            self.more_data_available = True
+            raise StopIteration
+
+        self.count += 1
+        
+        return result
+
+    # Python 2 compability
+    def next(self):
+        return self.__next__()
+
+
+
 def initialize(db = None):
     global database
     
@@ -76,30 +136,7 @@ def execute_query(collections, response_fields, response_limit, optimade_filter_
         print(request)
         print("====")
 
-    def results_generator(request):
-        inv_collection_mapper = dict((database_collection_mapper[k], k) for k in database_collection_mapper)
-         
-        count = 0
-        for query in request['queries']:
-            if query['type'] == 'find':
-                result = database.find(query['collection'], query['query'], request['projection'], limit=request['limit'])
-                result = list(result)
-                print("WHY?",query, result)
-                coll = inv_collection_mapper[query['collection']]
-                inv_field_map = dict((database_field_mapper[coll][k], k) for k in database_field_mapper[coll])
-                for row in result:
-                    count += 1
-                    if count > request['limit']:
-                           return
-                    rm = optimade_results_mapper[coll]
-                    rowdict = dict((inv_field_map[k],rm[k](row[k])) if k in rm else (inv_field_map[k],row[k]) for k in row)
-                    rowdict['type'] = coll
-                    yield rowdict
-                
-            else:
-                raise Exception("backend/example_mongodb: execute_query: unknown query type")
-
-    return results_generator(request)
+    return Results(request, response_limit)
 
 
 def close():
