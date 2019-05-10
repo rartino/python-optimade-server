@@ -29,7 +29,7 @@ import json, time
 
 try:
     from urllib2 import urlopen, HTTPError, URLError, Request
-except ModuleNotFoundError:
+except ImportError:
     from urllib.request import urlopen, HTTPError, URLError, Request
 
 class RequestError(Exception):
