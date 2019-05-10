@@ -25,30 +25,4 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import unittest
-
-import test_python_version
-import test_parser
-import test_optimade
-import test_serve_example_sqlite3
-import test_serve_example_mongodb
-import test_serve_example_wsgi
-import test_serve_example_django
-
-suite = unittest.TestLoader().loadTestsFromTestCase(test_python_version.TestPythonVer)
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParserExamples))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_optimade.TestOptimadeExamples))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_sqlite3.TestServeExampleSqlite3))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_mongodb.TestServeExampleMongoDB))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_wsgi.TestServeExampleWSGI))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_django.TestServeExampleDjango))
-
-unittest.TextTestRunner(verbosity=2).run(suite)
-
-    
+from .all import *

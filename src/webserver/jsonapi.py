@@ -92,9 +92,41 @@ def check_jsonapi_header_requirements(headers):
         _media_type, _sep, parameter = headers['Content-Type'].partition(";")
         if parameter.strip() != '':
             raise WebError("Requested content-type violates jsonapi requirements.", 415, "Unsupported Media Type")
-
-    if 'Accept' in headers and "JSON:API" in headers['Accept']:
-        _accept, _sep, parameter = headers['Content-Type'].partition(";")
-        if parameter.strip() != '':
-            raise WebError("Accept header violtates jsonapi requirements.", 406, "Not Acceptable")
+               
+    # The following implments my interpretation of the combination of RFC2616
+    # and the jsonapi 1.0 specification:
+    #
+    # - The jsonapi 1.0 spec states that the request MUST be rejected with 406 Not Acceptable
+    #   only if ALL these apply:
+    #      (a) There is an Accept header
+    #      (b) The Accept header explicitly specifies 'application/vnd.api+json' PLUS media parameters
+    #      (c) The Accept header does NOT specify 'application/vnd.api+json' WITHOUT media parameters
+    #
+    # - RFC2616 specifies that if there is an Accept header and the server cannot send a response
+    #   which is acceptable according to the combined Accept field value, then the server SHOULD
+    #   reject the request with a 406 Not Acceptable.
+    #
+    #   Hence, if we get an Accept header with no 'application/vnd.api+json', then we accept
+    #   the wildcards '*/*' and 'application/*'. BUT, if 'application/vnd.api+json' + media parameters
+    #   occur anywhere, we DON'T accept those wildcards.
+    # 
+    # To reject the wildcards does seem to violate the sprit of the Accept header, but the json 1.0 spec
+    # seems pretty set in its formulation with no exception for wildcards. I cannot, however, really
+    # forsee a realistic scenario where this actually causes any trouble.
+    #
+        
+    if 'accept' in headers:
+        accepts = [x.strip() for x in headers['accept'].split(',')]
+        may_accept_media_range = True
+        media_range_encountered = False
+        for accept in accepts:
+            if accept == 'application/vnd.api+json':                
+                break
+            if accept.split(";")[0] == 'application/vnd.api+json':
+                may_accept_media_range = False
+            if accept == '*/*' or accept == 'application/*':
+                media_range_encountered = True
+        else:
+            if not (may_accept_media_range and media_range_encountered):
+                raise WebError("Accept header violates jsonapi requirements.", 406, "Not Acceptable")
 

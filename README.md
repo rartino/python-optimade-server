@@ -90,7 +90,66 @@ listed in the sqlite3 example backend section.
 There are also some other examples of using parts of the provided
 routines in the directory `examples/`.
 
-# Notes 
+# Validation
+
+This implementation comes with a validator for OPTIMaDe API implementation.
+You can run it with:
+```
+./validate_url.py url [test_name] [test_name_2] ...
+```
+This validates the OPTIMaDe implementation at the base url `url` and
+reports any violations of the specification that it finds.
+
+If no url is given, then the test runs against `http://localhost:8080`.
+If you give optional `test_name` parameters, only those tests are run.
+(The names are deduciable from running a full test). This may be useful
+if one is trying to track down an error triggered by a specific test.
+
+The unit tests automatically runs the same set of validations against all
+the serving options (while simultaneously checking that running those
+validations does not trigger error messages from the server processes.)
+
+Note: only very limited validation is implemented so far.
+
+# Unit tests
+
+The unit tests are located under `tests/` and implemented in a way
+that is compatible both with Python:s standard unittest library and
+with pytest.
+
+The testing consist of two parts:
+
+* Running various stand-alone python scripts and checking that they
+  don't generate errors (any output on stderr). This includes
+  the scripts under examples/
+
+  New tests can be created as stand-alone python scripts
+  in the appropriate directory. Make sure they only print to
+  stderr if an unexpected error occurs.
+
+* Running each of the options to serve the OPTIMaDe API and
+  validating them using the tests provided in the
+  `src/validation` module.
+
+  New tests are created by simply extending the src/validation
+  module (including them in the all_tests array.)
+
+To run the tests using unittest, do:
+```
+  make unittests
+```
+or, for pytest:
+```
+  make pytest
+```
+
+If you want to run all tests with both Python 2 and 3, you can do:
+```
+  make tests
+```
+(Look in the `Makefile` for more details on test options.)
+
+# Final notes 
 
 - The parser of OPTIMaDe filter strings is relatively well-tested. 
   However, the parser output is then re-translated into a simpler 
@@ -98,11 +157,4 @@ routines in the directory `examples/`.
   That routine has not yet undergone heavy testing for all possible
   outcomes of the grammar, so it is possible that this function
   gets surprised by valid output of the parser and crashes.
-   
-- There are some unittests under `tests/`, they can be started with
-  ```
-  make tests
-  ```
-  (Look in the `Makefile` for more details.)
-
 

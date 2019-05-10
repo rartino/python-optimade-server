@@ -37,7 +37,7 @@ def generate_info_endpoint_reply(request):
     """
     available_api_versions = {}
     for ver in optimade_supported_versions:
-        available_api_versions[optimade_supported_versions[ver]] = baseurl + ver
+        available_api_versions[optimade_supported_versions[ver]] = request['baseurl'] + ver
 
     response = {
         "links": {
@@ -48,7 +48,7 @@ def generate_info_endpoint_reply(request):
                 "type": "info",
                 "id": "/",
                 "attributes": {
-                    "api_version": 'v'+version,
+                    "api_version": 'v'+request['version'],
                     "available_api_versions": available_api_versions,
                     "formats": [
                         "json"

@@ -25,30 +25,39 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import unittest
+import json, time
 
-import test_python_version
-import test_parser
-import test_optimade
-import test_serve_example_sqlite3
-import test_serve_example_mongodb
-import test_serve_example_wsgi
-import test_serve_example_django
+try:
+    from urllib2 import urlopen, HTTPError, URLError, Request
+except ModuleNotFoundError:
+    from urllib.request import urlopen, HTTPError, URLError, Request
 
-suite = unittest.TestLoader().loadTestsFromTestCase(test_python_version.TestPythonVer)
+class RequestError(Exception):
+    def __init__(self, msg, code):
+        super(RequestError, self).__init__(msg)
+        self.code = code
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParserExamples))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_optimade.TestOptimadeExamples))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_sqlite3.TestServeExampleSqlite3))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_mongodb.TestServeExampleMongoDB))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_wsgi.TestServeExampleWSGI))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_django.TestServeExampleDjango))
-
-unittest.TextTestRunner(verbosity=2).run(suite)
+def request(url,headers=None):
+    retry = 5
+    lasterr = None
+    while retry > 0:
+        try:
+            if headers is not None:                
+                req = Request(url)
+                for header in headers:
+                    req.add_header(header, headers[header])
+            else:
+                req = url
+            uo = urlopen(req)
+            output = json.load(uo)
+            headers = uo.info()
+            return {'response':output, 'headers':headers, 'code':uo.code}
+        except HTTPError as e:
+            raise RequestError("Could not fetch resource: "+str(e), e.code)
+        except URLError as e:
+            lasterr = e
+            retry-=1
+            time.sleep(1.0)
+    raise RequestError("Could not fetch resource: "+str(lasterr),None)
 
     

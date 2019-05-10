@@ -38,7 +38,7 @@ def wsgi_get_request(environ):
 
     request = {}
 
-    request['headers'] = dict((x[5:], environ[x]) for x in environ if x.startswith("_HTTP_"))
+    request['headers'] = dict((x[5:].lower(), environ[x]) for x in environ if x.startswith("HTTP_"))
 
     if 'REQUEST_METHOD' not in environ:
         return {}

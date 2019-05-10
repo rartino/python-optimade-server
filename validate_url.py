@@ -24,31 +24,34 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+'''
+This program accepts an URL, or uses http://localhost:8080 if none is given.
 
-import unittest
+It runs code to validate the OPTIMaDe API on that URL.
+'''
+from __future__ import print_function
 
-import test_python_version
-import test_parser
-import test_optimade
-import test_serve_example_sqlite3
-import test_serve_example_mongodb
-import test_serve_example_wsgi
-import test_serve_example_django
+import os, sys
+from pprint import pprint
 
-suite = unittest.TestLoader().loadTestsFromTestCase(test_python_version.TestPythonVer)
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'src'))
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParserExamples))
+import validation
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_optimade.TestOptimadeExamples))
+if __name__ == "__main__":
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_sqlite3.TestServeExampleSqlite3))
+    if len(sys.argv)<2:
+        url = 'http://localhost:8080'
+    else:
+        url = sys.argv[1]
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_mongodb.TestServeExampleMongoDB))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_wsgi.TestServeExampleWSGI))
-
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_serve_example_django.TestServeExampleDjango))
-
-unittest.TextTestRunner(verbosity=2).run(suite)
-
+    if len(sys.argv) >= 3:
+        tests = sys.argv[2:]
+    else:
+        tests = None
+        
+    result = validation.run(url, tests)
+    print("==== Validation results of:",url)
+    pprint(result)
+    
     

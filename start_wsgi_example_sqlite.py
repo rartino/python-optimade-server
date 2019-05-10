@@ -99,14 +99,12 @@ def _json_format(response):
 def app(environ, start_response):
 
     request = webserver.wsgi_get_request(environ)
-    
-    webserver.check_jsonapi_header_requirements(request['headers'])
-    
+
     try:
+        webserver.check_jsonapi_header_requirements(request['headers'])
         response = optimade.process(request, backend.execute_query, debug = True)
-    except optimade.OptimadeError as e:
+    except (optimade.OptimadeError, webserver.WebError) as e:
         error = webserver.JsonapiError("Could not process request: "+str(e),e.response_code,e.response_msg)
-        
         start_response(str(error.response_code) + " "+str(error.response_msg), [('Content-Type',error.content_type)])
         return [codecs.encode(error.content,'utf-8')]
 
@@ -118,11 +116,15 @@ backend.initialize()
 
 if __name__ == "__main__":
 
+    from wsgiref.simple_server import make_server, WSGIRequestHandler
+    
+    class StdoutLoggingWSGIRequestHandler(WSGIRequestHandler):
+        def log_message(self, format, *args):
+            print(format % args)
+    
     baseurl = 'http://localhost:8080/'
     
-    from wsgiref.simple_server import make_server
-
-    srv = make_server('localhost', 8080, app)
+    srv = make_server('localhost', 8080, app, handler_class=StdoutLoggingWSGIRequestHandler)
     srv.serve_forever()
     backend.close()
 
