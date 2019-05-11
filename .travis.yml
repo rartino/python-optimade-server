@@ -17,4 +17,5 @@ addons:
 dist: xenial
 
 script:
+    - systemctl start mongodb.service
     - make pytest
