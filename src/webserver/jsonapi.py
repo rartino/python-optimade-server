@@ -119,7 +119,6 @@ def check_jsonapi_header_requirements(headers):
         accepts = [x.strip() for x in headers['accept'].split(',')]
         may_accept_media_range = True
         media_range_encountered = False
-        print "ACCEPT",accepts
         for accept in accepts:
             if accept == 'application/vnd.api+json':                
                 break
