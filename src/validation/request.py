@@ -25,7 +25,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import json, time
+import json, time, codecs
 
 try:
     from urllib2 import urlopen, HTTPError, URLError, Request
@@ -49,7 +49,8 @@ def request(url,headers=None):
             else:
                 req = url
             uo = urlopen(req)
-            output = json.load(uo)
+            reader = codecs.getreader("utf-8")
+            output = json.load(reader(uo))
             headers = uo.info()
             return {'response':output, 'headers':headers, 'code':uo.code}
         except HTTPError as e:
