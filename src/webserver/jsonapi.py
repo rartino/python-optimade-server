@@ -119,12 +119,13 @@ def check_jsonapi_header_requirements(headers):
         accepts = [x.strip() for x in headers['accept'].split(',')]
         may_accept_media_range = True
         media_range_encountered = False
+        print "ACCEPT",accepts
         for accept in accepts:
             if accept == 'application/vnd.api+json':                
                 break
             if accept.split(";")[0] == 'application/vnd.api+json':
                 may_accept_media_range = False
-            if accept == '*/*' or accept == 'application/*':
+            if accept.split(";")[0] == '*/*' or accept.split(";")[0] == 'application/*':
                 media_range_encountered = True
         else:
             if not (may_accept_media_range and media_range_encountered):
