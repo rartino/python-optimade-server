@@ -1,7 +1,5 @@
 language: python
 
-sudo: required
-
 python:
   - "2.7"
   - "3.4"
@@ -9,13 +7,11 @@ python:
   - "3.6"
   - "3.7"
 
-addons:
-    apt:
-        packages:
-            - mongodb
+services:
+  - mongodb
 
 dist: xenial
 
 script:
-    - sudo systemctl start mongodb.service
+    - systemctl start mongodb.service
     - make pytest
