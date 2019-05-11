@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Materials-Consortia/python-optimade-candidate-reference-implementation.svg?branch=master)](https://travis-ci.org/Materials-Consortia/python-optimade-candidate-reference-implementation)
+
 Python OPTIMaDe Candidate Reference Implementation
 ==================================================
 
