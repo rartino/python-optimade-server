@@ -1,0 +1,5 @@
+('OR',
+ ('<=', ('Identifier', 'aax'), ('Number', '+.1e8')),
+ ('AND',
+  ('>=', ('Identifier', 'c21'), ('Number', '10')),
+  ('NOT', ('!=', ('Identifier', 'x'), ('String', '"Some string"')))))

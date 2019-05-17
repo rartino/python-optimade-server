@@ -1,0 +1,3 @@
+('AND',
+ ('NOT', ('>', ('Identifier', 'a'), ('Identifier', 'b'))),
+ ('>', ('Identifier', 'x'), ('Number', '0')))

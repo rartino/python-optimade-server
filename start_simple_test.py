@@ -48,9 +48,9 @@ if __name__ == "__main__":
     response_fields = ["id", "chemical_formula", "elements"]
 
     if len(sys.argv) >= 2:
-        input_string = 'filter='+sys.argv[1]
+        input_string = sys.argv[1]
     else:
-        input_string = 'filter=elements="Ga,Ti" AND (nelements=3 OR nelements=2)'
+        input_string ='elements="Ga,Ti" AND (nelements=3 OR nelements=2)'
         
     response_limit = 50
     

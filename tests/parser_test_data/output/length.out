@@ -1,0 +1,11 @@
+('AND',
+ ('LENGTH', '=', ('Identifier', 'elements'), ('Number', '42')),
+ ('AND',
+  ('LENGTH', '>', ('Identifier', 'elements'), ('Number', '42')),
+  ('AND',
+   ('LENGTH', '<', ('Identifier', 'elements'), ('Number', '42')),
+   ('AND',
+    ('LENGTH', '!=', ('Identifier', 'elements'), ('Number', '42')),
+    ('AND',
+     ('LENGTH', '>=', ('Identifier', 'elements'), ('Number', '42')),
+     ('LENGTH', '<=', ('Identifier', 'elements'), ('Number', '42')))))))

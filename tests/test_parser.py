@@ -24,35 +24,60 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import print_function
 
-import os, unittest, subprocess, argparse
+import sys, os, unittest, subprocess, argparse, ast, pprint, codecs
 
-top = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-directory = os.path.join(top,'examples','parser') 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'src'))
+from parse import initialize_optimade_parser, parse_optimade_filter, ParserError
 
-def run(command,args=[]):
-    args = list(args)
-    popen = subprocess.Popen([command] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return popen.communicate()
-    
-def execute(self, command, *args):
-    out,err = run(os.path.join(directory,command),args)
-    self.assertTrue(len(err.strip())==0, msg=err)
+tests = os.path.abspath(os.path.dirname(__file__))
+directory = os.path.join(tests,'parser_test_data','input')
+directory_out = os.path.join(tests,'parser_test_data','output')
 
-class TestParserExamples(unittest.TestCase):
+class TestParser(unittest.TestCase):
     pass
 
-test_programs = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and f.endswith(".py")]
+filter_input_pass = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and f.endswith(".filter") and not f.endswith("_fail.filter")]
+filter_input_fail = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and f.endswith("_fail.filter")]
 
-def function_factory(program):
-    def exec_func(slf):
-        execute(slf,program)
+def pass_function_factory(filter_input_file, filter_output_file):
+    def exec_func(self):
+        with open(os.path.join(directory,filter_input_file),'r') as f:
+            filter_input = f.read()
+        try:
+            filter_ast = parse_optimade_filter(filter_input)
+        except ParserError:
+            self.assertFalse(True,msg="Filter string did not parse: "+str(filter_input))
+
+        with codecs.open(os.path.join(directory,filter_output_file),'r',encoding='utf-8') as f:
+            filter_expected_output_string = f.read()
+        filter_expected_output = ast.literal_eval(filter_expected_output_string)
+        self.assertTrue(filter_expected_output == filter_ast,msg="Parse tree does not match pre-recorded output.\n"+"==== Expected: ====\n"+filter_expected_output_string+"==== Got: ====\n"+pprint.pformat(filter_ast)+"\n====")
+            
     return exec_func
 
-for program in test_programs:
-    exec_func = function_factory(program)
-    program_name, ext = os.path.splitext(program)
-    setattr(TestParserExamples,'test_'+program_name,exec_func)
+def fail_function_factory(filter_input_file):
+    def exec_func(self):
+        with open(os.path.join(directory,filter_input_file),'r') as f:
+            filter_input = f.read()
+        try:
+            filter_ast = parse_optimade_filter(filter_input)
+        except ParserError:
+            pass
+        else:
+            self.assertFalse(True,msg="Filter string meant to fail parsing unexpectedly passed: "+str(filter_input))
+    return exec_func
+
+for filter_input_file in filter_input_pass:
+    filter_name, ext = os.path.splitext(filter_input_file)
+    exec_func = pass_function_factory(filter_input_file, os.path.join(directory_out,filter_name+".out"))
+    setattr(TestParser,'test_parse_filter_'+filter_name,exec_func)
+
+for filter_input_file in filter_input_fail:
+    exec_func = fail_function_factory(filter_input_file)
+    filter_name, ext = os.path.splitext(filter_input_file)
+    setattr(TestParser,'test_parse_filter_'+filter_name,exec_func)    
 
     
 #############################################################################
@@ -60,10 +85,26 @@ for program in test_programs:
             
 if __name__ == '__main__':
 
-    ap = argparse.ArgumentParser(description="Parser tests")
-    args, leftovers = ap.parse_known_args()
+    if len(sys.argv) > 1 and sys.argv[1] == 'out':
+
+        for filter_input_file in filter_input_pass:        
+            filter_name, ext = os.path.splitext(filter_input_file)        
+            outname = os.path.join(directory_out,filter_name+".out")
+            if os.path.exists(outname):
+                print("Skipping existing:"+filter_name)
+                continue
+            print("Generating:"+filter_name)
+            with open(os.path.join(directory,filter_input_file),'r') as f:
+                filter_input = f.read()
+            filter_ast = parse_optimade_filter(filter_input)
+            with codecs.open(outname, "w", encoding='utf-8') as fout:
+                pprint.pprint(filter_ast, fout)
+            
+    else:    
+        ap = argparse.ArgumentParser(description="Example tests")
+        args, leftovers = ap.parse_known_args()
     
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestParserExamples)
-    unittest.TextTestRunner(verbosity=2).run(suite)        
+        suite = unittest.TestLoader().loadTestsFromTestCase(TestParser)
+        unittest.TextTestRunner(verbosity=2).run(suite)        
 
     

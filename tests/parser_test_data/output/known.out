@@ -1,0 +1,3 @@
+('AND',
+ ('IS_KNOWN', ('Identifier', 'chemical_formula')),
+ ('IS_UNKNOWN', ('Identifier', 'prototype_formula')))

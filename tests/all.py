@@ -29,6 +29,7 @@ import unittest
 
 import test_python_version
 import test_parser
+import test_examples
 import test_optimade
 import test_serve_example_sqlite3
 import test_serve_example_mongodb
@@ -37,7 +38,9 @@ import test_serve_example_django
 
 suite = unittest.TestLoader().loadTestsFromTestCase(test_python_version.TestPythonVer)
 
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParserExamples))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_parser.TestParser))
+
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_examples.TestExamples))
 
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(test_optimade.TestOptimadeExamples))
 

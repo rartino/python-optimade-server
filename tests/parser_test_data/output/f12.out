@@ -1,0 +1,7 @@
+('AND',
+ ('>', ('Identifier', 'a'), ('Number', '1')),
+ ('OR',
+  ('<', ('Identifier', 'b'), ('Number', '10')),
+  ('OR',
+   ('!=', ('Identifier', 'c'), ('Identifier', 'b')),
+   ('>', ('Identifier', 'x'), ('Number', '100')))))

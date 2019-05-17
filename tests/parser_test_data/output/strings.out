@@ -1,0 +1,11 @@
+('AND',
+ ('=', ('Identifier', 'chemical_formula'), ('String', '"He"')),
+ ('AND',
+  ('>', ('Identifier', 'chemical_formula'), ('String', '"He"')),
+  ('AND',
+   ('<', ('Identifier', 'chemical_formula'), ('String', '"He"')),
+   ('AND',
+    ('<=', ('Identifier', 'chemical_formula'), ('String', '"He"')),
+    ('AND',
+     ('>=', ('Identifier', 'chemical_formula'), ('String', '"He"')),
+     ('!=', ('Identifier', 'chemical_formula'), ('String', '"He"')))))))

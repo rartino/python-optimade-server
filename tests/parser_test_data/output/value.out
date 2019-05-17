@@ -1,0 +1,11 @@
+('AND',
+ ('=', ('Identifier', 'nelements'), ('Number', '42')),
+ ('AND',
+  ('>', ('Identifier', 'nelements'), ('Number', '42')),
+  ('AND',
+   ('<', ('Identifier', 'nelements'), ('Number', '42')),
+   ('AND',
+    ('!=', ('Identifier', 'nelements'), ('Number', '42')),
+    ('AND',
+     ('>=', ('Identifier', 'nelements'), ('Number', '42')),
+     ('<=', ('Identifier', 'nelements'), ('Number', '42')))))))

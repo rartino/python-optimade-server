@@ -1,0 +1,5 @@
+('OR',
+ ('<=', ('Identifier', 'aax'), ('Number', '+.1e8')),
+ ('AND',
+  ('>=', ('Identifier', 'c21'), ('String', '"Sąžininga žąsis"')),
+  ('NOT', ('!=', ('Identifier', 'x'), ('String', '"Some \\\\ \\"string\\""')))))
