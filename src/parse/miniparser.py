@@ -1022,7 +1022,7 @@ def _build_parse_tables(rule_table, first_table, terminals, start, precedence):
                 todo.append(new_cl)                    
 
     for warning in warnings:
-        logger("WARNING: shift/reduce conflict soved by shift for symbol:'"+str(warning)+"', involving rules:")
+        logger("WARNING: shift/reduce conflict solved by shift for symbol:'"+str(warning)+"', involving rules:")
         logger(warnings[warning], pretty=True)
 
     return parse_table
