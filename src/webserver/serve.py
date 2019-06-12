@@ -118,6 +118,7 @@ class _CallbackRequestHandler(BaseHTTPRequestHandler):
                 output = callback(request)
             self.send_response(output['response_code'])
             self.send_header('Content-type', output['content_type'])
+            self.send_header('Access-control-allow-origin', '*')
             self.end_headers()
             self.wfile_write_encoded(output['content'], output['encoding'])
 
