@@ -1,0 +1,5 @@
+('AND',
+ ('<', ('Identifier', '_exmpl_melting_point'), ('Number', '300')),
+ ('AND',
+  ('=', ('Identifier', 'nelements'), ('Number', '4')),
+  ('=', ('Identifier', 'elements'), ('String', '"Si,O2"'))))

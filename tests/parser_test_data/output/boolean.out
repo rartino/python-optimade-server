@@ -1,0 +1,8 @@
+('NOT',
+ ('OR',
+  ('AND',
+   ('=', ('Identifier', 'chemical_formula'), ('String', '"Al"')),
+   ('=', ('Identifier', 'prototype_formula'), ('String', '"A"'))),
+  ('AND',
+   ('=', ('Identifier', 'prototype_formula'), ('String', '"H2O"')),
+   ('NOT', ('=', ('Identifier', 'chemical_formula'), ('String', '"Ti"'))))))

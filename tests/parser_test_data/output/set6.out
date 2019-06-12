@@ -1,0 +1,8 @@
+('HAS_ZIP_ANY',
+ (('>', '=', '>'), ('=', '>', '<'), ('=', '<', '=')),
+ (('Identifier', 'elements'),
+  ('Identifier', '_exmpl_element_counts'),
+  ('Identifier', '_exmpl_element_weights')),
+ ((('Number', '3'), ('String', '"He"'), ('Number', '55.3')),
+  (('Number', '6'), ('String', '"Ti"'), ('Number', '37.6')),
+  (('Number', '8'), ('String', '"Ga"'), ('Number', '0'))))

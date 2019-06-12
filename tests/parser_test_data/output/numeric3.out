@@ -1,0 +1,3 @@
+('AND',
+ ('>', ('Identifier', '_exmpl_bandgap'), ('Number', '5.0')),
+ ('<', ('Identifier', '_exmpl_molecular_weight'), ('Number', '350')))

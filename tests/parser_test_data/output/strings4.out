@@ -1,0 +1,3 @@
+('AND',
+ ('STARTS', ('Identifier', 'prototype_formula'), ('String', '"B2"')),
+ ('ENDS', ('Identifier', 'prototype_formula'), ('String', '"D2"')))

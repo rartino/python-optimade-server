@@ -1,0 +1,3 @@
+('AND',
+ ('CONTAINS', ('Identifier', 'prototype_formula'), ('String', '"C2"')),
+ ('STARTS', ('Identifier', 'prototype_formula'), ('String', '"A2"')))

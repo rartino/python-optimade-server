@@ -1,0 +1,3 @@
+('AND',
+ ('=', ('Identifier', 'chemical_formula'), ('String', '"H2O"')),
+ ('!=', ('Identifier', 'prototype_formula'), ('String', '"AB"')))

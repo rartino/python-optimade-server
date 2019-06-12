@@ -1,0 +1,8 @@
+('OR',
+ ('<=', ('Identifier', '_exmpl_aax'), ('Number', '+.1e8')),
+ ('AND',
+  ('>=', ('Identifier', 'nelements'), ('Number', '10')),
+  ('NOT',
+   ('OR',
+    ('!=', ('Identifier', '_exmpl_x'), ('String', '"Some string"')),
+    ('NOT', ('=', ('Identifier', '_exmpl_a'), ('Number', '7')))))))

@@ -1,0 +1,8 @@
+('AND',
+ ('=', ('Identifier', 'b'), ('String', '"kva"')),
+ ('OR',
+  ('<', ('Number', '1'), ('Identifier', 's')),
+  ('NOT',
+   ('AND',
+    ('!=', ('Identifier', 'x'), ('Identifier', 'y')),
+    ('>', ('Identifier', 'z'), ('Number', '0'))))))

@@ -5,12 +5,16 @@ Filter = Expression ;
 
 (* Values *)
 
+Constant = String | Number ;
+
 Value = String | Number | Identifier ;
 (* Note: support for Identifier in Value is OPTIONAL *)
 
-ValueList = Value, {',', Value } ;
+ValueList = [ Operator ], Value, {',', [ Operator ], Value } ;
+(* Support for Operator in ValueList is OPTIONAL *)
 
-ValueZip = Value, ':', Value, {':', Value} ;
+ValueZip = [ Operator ], Value, ':', [ Operator ], Value, {':', [ Operator ], Value} ;
+(* Support for the optional Operator in ValueZip is OPTIONAL *)
 
 ValueZipList = ValueZip, { ',', ValueZip } ;
 
@@ -23,12 +27,16 @@ Space = ' ' | '\t' ;
 AND = "AND" ; (* a short-hand for: AND = 'A', 'N', 'D' *)
 NOT = "NOT" ;
 OR = "OR" ;
+
+IS = "IS" ;
 KNOWN = "KNOWN" ;
 UNKNOWN = "UNKNOWN" ;
-IS = "IS" ;
+
 CONTAINS = "CONTAINS" ;
 STARTS = "STARTS" ;
 ENDS = "ENDS" ;
+WITH = "WITH" ;
+
 LENGTH = "LENGTH" ;
 HAS = "HAS" ;
 ALL = "ALL" ;
@@ -48,7 +56,11 @@ ExpressionPhrase = [ NOT ], ( Comparison | PredicateComparison | '(', Expression
 
 Operator = '<', [ '=' ] | '>', [ '=' ] | '=' | '!', '=' ;
 
-Comparison = Identifier, ( 
+Comparison = ConstantFirstComparison |
+             IdentifierFirstComparison ;
+(* Note: support for ConstantFirstComparison is OPTIONAL *)
+
+IdentifierFirstComparison = Identifier, ( 
                 ValueOpRhs |
                 KnownOpRhs |
                 FuzzyStringOpRhs |
@@ -56,16 +68,19 @@ Comparison = Identifier, (
                 SetZipOpRhs );
 (* Note: support for SetZipOpRhs in Comparison is OPTIONAL *)
 
+ConstantFirstComparison = Constant, ValueOpRhs ;
+                
 PredicateComparison = LengthComparison ;
 
 ValueOpRhs = Operator, Value ;
 
-KnownOpRhs = IS, ( KNOWN | UNKNOWN );  
+KnownOpRhs = IS, ( KNOWN | UNKNOWN ) ; 
 
-FuzzyStringOpRhs = CONTAINS, String | STARTS, String | ENDS, String ;
+FuzzyStringOpRhs = CONTAINS, String | STARTS, [ WITH ], String | ENDS, [ WITH ], String ;
 
-SetOpRhs = HAS, ( Value | ALL, ValueList | EXACTLY, ValueList | ANY, ValueList | ONLY, ValueList );
+SetOpRhs = HAS, ( [ Operator ], Value | ALL, ValueList | EXACTLY, ValueList | ANY, ValueList | ONLY, ValueList ) ;
 (* Note: support for ONLY in SetOpRhs is OPTIONAL *)
+(* Note: support for [ Operator ] in SetOpRhs is OPTIONAL *)
 
 SetZipOpRhs = IdentifierZipAddon, HAS, ( ValueZip | ONLY, ValueZipList | ALL, ValueZipList | EXACTLY, ValueZipList | ANY, ValueZipList ) ;
 

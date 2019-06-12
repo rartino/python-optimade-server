@@ -1,0 +1,6 @@
+('AND',
+ ('HAS', ('<',), ('Identifier', '_exmpl_element_counts'), (('Number', '3'),)),
+ ('HAS_ANY',
+  ('>', '=', '=', '!='),
+  ('Identifier', '_exmpl_element_counts'),
+  (('Number', '3'), ('Number', '6'), ('Number', '4'), ('Number', '8'))))

@@ -1,0 +1,5 @@
+('OR',
+ ('NOT', ('>', ('Identifier', 'a'), ('Identifier', 'b'))),
+ ('AND',
+  ('=', ('Identifier', 'c'), ('Number', '100')),
+  ('=', ('Identifier', 'f'), ('String', '"C2 H6"'))))
