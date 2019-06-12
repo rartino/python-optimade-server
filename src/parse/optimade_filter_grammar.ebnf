@@ -1,7 +1,7 @@
 (* BEGIN EBNF GRAMMAR Filter *)
 (* The top-level 'filter' rule: *)
 
-Filter = Expression ;
+Filter = [Spaces], Expression ;
 
 (* Values *)
 
@@ -10,39 +10,13 @@ Constant = String | Number ;
 Value = String | Number | Identifier ;
 (* Note: support for Identifier in Value is OPTIONAL *)
 
-ValueList = [ Operator ], Value, {',', [ Operator ], Value } ;
+ValueList = [ Operator ], Value, { Comma, [ Operator ], Value } ;
 (* Support for Operator in ValueList is OPTIONAL *)
 
-ValueZip = [ Operator ], Value, ':', [ Operator ], Value, {':', [ Operator ], Value} ;
+ValueZip = [ Operator ], Value, Colon, [ Operator ], Value, {Colon, [ Operator ], Value} ;
 (* Support for the optional Operator in ValueZip is OPTIONAL *)
 
-ValueZipList = ValueZip, { ',', ValueZip } ;
-
-(* White-space: *)
-
-Space = ' ' | '\t' ;
-
-(* Boolean relations: *)
-
-AND = "AND" ; (* a short-hand for: AND = 'A', 'N', 'D' *)
-NOT = "NOT" ;
-OR = "OR" ;
-
-IS = "IS" ;
-KNOWN = "KNOWN" ;
-UNKNOWN = "UNKNOWN" ;
-
-CONTAINS = "CONTAINS" ;
-STARTS = "STARTS" ;
-ENDS = "ENDS" ;
-WITH = "WITH" ;
-
-LENGTH = "LENGTH" ;
-HAS = "HAS" ;
-ALL = "ALL" ;
-ONLY = "ONLY" ;
-EXACTLY = "EXACTLY" ;
-ANY = "ANY" ;
+ValueZipList = ValueZip, { Comma, ValueZip } ;
 
 (* Expressions *)
 
@@ -50,11 +24,7 @@ Expression = ExpressionClause, [ OR, Expression ] ;
 
 ExpressionClause = ExpressionPhrase, [ AND, ExpressionClause ] ;
 
-ExpressionPhrase = [ NOT ], ( Comparison | PredicateComparison | '(', Expression, ')' );
-
-(* OperatorComparison operator tokens: *)
-
-Operator = '<', [ '=' ] | '>', [ '=' ] | '=' | '!', '=' ;
+ExpressionPhrase = [ NOT ], ( Comparison | PredicateComparison | OpeningBrace, Expression, ClosingBrace );
 
 Comparison = ConstantFirstComparison |
              IdentifierFirstComparison ;
@@ -69,7 +39,7 @@ IdentifierFirstComparison = Identifier, (
 (* Note: support for SetZipOpRhs in Comparison is OPTIONAL *)
 
 ConstantFirstComparison = Constant, ValueOpRhs ;
-                
+				
 PredicateComparison = LengthComparison ;
 
 ValueOpRhs = Operator, Value ;
@@ -86,30 +56,72 @@ SetZipOpRhs = IdentifierZipAddon, HAS, ( ValueZip | ONLY, ValueZipList | ALL, Va
 
 LengthComparison = LENGTH, Identifier, Operator, Value ;
 
-IdentifierZipAddon = ':', Identifier, {':', Identifier} ;
+IdentifierZipAddon = Colon, Identifier, {Colon, Identifier} ;
+
+(* TOKENS *)
+
+(* Separators: *)
+
+OpeningBrace = '(', [Spaces] ;
+ClosingBrace = ')', [Spaces] ;
+
+Comma = ',', [Spaces] ;
+Colon = ':', [Spaces] ;
+
+(* Boolean relations: *)
+
+AND = 'A', 'N', 'D', [Spaces] ;
+NOT = 'N', 'O', 'T', [Spaces] ;
+OR = 'O', 'R', [Spaces] ;
+
+IS = 'I', 'S', [Spaces] ;
+KNOWN = 'K', 'N', 'O', 'W', 'N', [Spaces] ;
+UNKNOWN = 'U', 'N', 'K', 'N', 'O', 'W', 'N', [Spaces] ;
+
+CONTAINS = 'C', 'O', 'N', 'T', 'A', 'I', 'N', 'S', [Spaces] ;
+STARTS = 'S', 'T', 'A', 'R', 'T', 'S', [Spaces] ;
+ENDS = 'E', 'N', 'D', 'S', [Spaces] ;
+WITH = 'W', 'I', 'T', 'H', [Spaces] ;
+
+LENGTH = 'L', 'E', 'N', 'G', 'T', 'H', [Spaces] ;
+HAS = 'H', 'A', 'S', [Spaces] ;
+ALL = 'A', 'L', 'L', [Spaces] ;
+ONLY = 'O', 'N', 'L', 'Y', [Spaces] ;
+EXACTLY = 'E', 'X', 'A', 'C', 'T', 'L', 'Y', [Spaces] ;
+ANY = 'A', 'N', 'Y', [Spaces] ;
+
+(* OperatorComparison operator tokens: *)
+
+Operator = ( '<', [ '=' ] | '>', [ '=' ] | '=' | '!', '=' ), [Spaces] ;
 
 (* Identifier syntax *)
 
-Identifier = Letter, { Letter | Digit } ;
+Identifier = LowercaseLetter, { LowercaseLetter | Digit }, [Spaces] ;
 
-Letter =
+Letter = UppercaseLetter | LowercaseLetter ;
+
+UppercaseLetter =
     'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' |
     'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' |
-    'Y' | 'Z' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' |
-    'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' |
-    'w' | 'x' | 'y' | 'z' | '_'
+    'Y' | 'Z'
+;
+
+LowercaseLetter =
+    'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 
+    'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' |
+    'y' | 'z' | '_'
 ;
 
 (* Strings: *)
 
-String = '"', { EscapedChar }, '"' ;
+String = '"', { EscapedChar }, '"', [Spaces] ;
 
 EscapedChar = UnescapedChar | '\', '"' | '\', '\' ;
 
 UnescapedChar = Letter | Digit | Space | Punctuator | UnicodeHighChar ;
 
 Punctuator =
-    '!' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | 
+    '!' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+' | ',' |
     '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '?' | '@' | '[' |
     ']' | '^' | '`' | '{' | '|' | '}' | '~'
 ;
@@ -124,7 +136,7 @@ UnicodeHighChar = ? [^\x00-\xFF] ? ;
 
 Number = [ Sign ] ,
          ( Digits, [ '.', [ Digits ] ] | '.' , Digits ),
-         [ Exponent ] ;
+         [ Exponent ], [Spaces] ;
 
 Exponent =  ( 'e' | 'E' ) , [ Sign ] , Digits ;
 
@@ -133,6 +145,12 @@ Sign = '+' | '-' ;
 Digits =  Digit, { Digit } ;
 
 Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
+
+(* White-space: *)
+
+Space = ' ' | '\t' ;
+
+Spaces = Space, { Space } ;
 
 (* END EBNF GRAMMAR Number *)
 (* END EBNF GRAMMAR Filter *)

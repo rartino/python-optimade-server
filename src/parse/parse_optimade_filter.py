@@ -60,14 +60,18 @@ def initialize_optimade_parser():
         grammar = f.read()
 
     # Keywords
-    literals = ["AND", "NOT", "OR", "KNOWN", "UNKNOWN", "IS", "CONTAINS", "STARTS", "ENDS", "WITH", "LENGTH", "HAS", "ALL", "ONLY", "EXACTLY", "ANY", ")", "(", ":", ","," ","\t","\n","\r"]
+    literals = ["AND", "NOT", "OR", "KNOWN", "UNKNOWN", "IS", "CONTAINS", "STARTS", "ENDS", "WITH", "LENGTH", "HAS", "ALL", "ONLY", "EXACTLY", "ANY"," ","\t","\n","\r"]
 
-    # Token definitions from Appendix 3 (they are not all there yet)
+    # Token definitions from Appendix 3
     tokens = {
         "Operator": r'<|<=|>|>=|=|!=',
-        "Identifier": "[a-zA-Z_][a-zA-Z_0-9]*",
+        "Identifier": "[a-z][a-z_0-9]*",
         "String": r'"[^"\\]*(?:\\.[^"\\]*)*"',
-        "Number": r"[-+]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][-+]?[0-9]+)?"
+        "Number": r"[-+]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][-+]?[0-9]+)?",
+        "OpeningBrace": r"\(",
+        "ClosingBrace": r"\)",
+        "Colon": r":",
+        "Comma": r","
     }
     partial_tokens = {
         "Number": r"[-+]?[0-9]*\.?[0-9]*[eE]?[-+]?[0-9]*"
@@ -76,7 +80,7 @@ def initialize_optimade_parser():
     # by the token definitions.
     skip = [
         "EscapedChar", "UnescapedChar", "Punctuator", "Exponent", "Sign",
-        "Digits", "Digit", "Letter", "Operator"
+        "Digits", "Digit", "Letter", "Operator", "UppercaseLetter", "LowercaseLetter", "OpeningBrace", "ClosingBrace", "Comma", "Colon"
     ]
 
     ls = build_ls(ebnf_grammar=grammar, start='Filter', ignore=' \t\n',
@@ -115,6 +119,8 @@ def optimade_parse_tree_to_ojf_recurse(node, recursion=0):
                 pos[arg] = [nn[0], tuple(pos[arg]), None]
                 pos = pos[arg]
                 arg = 2
+            elif nn[0] in ["OpeningBrace", "ClosingBrace"]:
+                pass
             else:
                 pprint(nn)
                 raise Exception("Internal error: filter simplify on invalid ast: "+str(nn[0]))
