@@ -30,8 +30,10 @@ from .response import *
 from .base_info import *
 from .entry import *
 from .headers import *
+from .schema import schema_validate_request
 
 all_tests = [
+    {'name':'base_info_schema', 'relurl':'/structures', 'test':schema_validate_request, 'validation':None},    
     {'name':'base_info', 'relurl':'/info', 'test':validate_base_info_request, 'validation':validate_base_info},
 
     {'name':'headers', 'relurl':'/info', 'test':validate_headers, 'validation':None},    

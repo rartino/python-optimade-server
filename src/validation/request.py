@@ -50,9 +50,11 @@ def request(url,headers=None):
                 req = url
             uo = urlopen(req)
             reader = codecs.getreader("utf-8")
-            output = json.load(reader(uo))
+            raw_output = reader(uo).read()
+            #output = json.load(reader(uo))
+            output = json.loads(raw_output)
             headers = uo.info()
-            return {'response':output, 'headers':headers, 'code':uo.code}
+            return {'response':output, 'raw_output':raw_output, 'headers':headers, 'code':uo.code}
         except HTTPError as e:
             raise RequestError("Could not fetch resource: "+str(e), e.code)
         except URLError as e:

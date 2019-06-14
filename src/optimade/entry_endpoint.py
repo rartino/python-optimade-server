@@ -27,6 +27,20 @@
 
 import datetime
 
+def iso_8601_format(dt):
+    """YYYY-MM-DDThh:mm:ssTZD (1997-07-16T19:20:30-03:00)"""
+
+    if dt is None:
+        return ""
+
+    fmt_datetime = dt.strftime('%Y-%m-%dT%H:%M:%S')
+    tz = dt.utcoffset()
+    if tz is None:
+        fmt_timezone = "+00:00"
+    else:
+        fmt_timezone = str.format('{0:+06.2f}', float(tz.total_seconds() / 3600))
+
+    return fmt_datetime + fmt_timezone
 
 def generate_entry_endpoint_reply(request, data):
     """
@@ -48,7 +62,7 @@ def generate_entry_endpoint_reply(request, data):
         "links": {
             "base_url": request['baseurl'],
             # Pagination not supported yet (which is OK according to specification)
-            "next": None
+            "next": { "href": "https://www.example.com/" } #TODO:FIXME #BUG? Should be allowed to be a string
         },
         "data": data_part,
         "meta": {
@@ -56,9 +70,10 @@ def generate_entry_endpoint_reply(request, data):
                 "representation": request['representation']
             },
             "api_version": request['version'],
-            "time_stamp": datetime.datetime.now().isoformat(),
+            "time_stamp": iso_8601_format(datetime.datetime.now()),
             "data_returned": len(data_part),
             "more_data_available": data.more_data_available,
+            "provider": { "name":"provider", "description":"provider", "prefix":"exmpl", "homepage": "http://www.example.com/" },
         }        
     }
 

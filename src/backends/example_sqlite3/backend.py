@@ -38,7 +38,7 @@ database_column_mapper = {
     'structures': {
         'id': 'id',
         'local_id': 'local_id',
-        'modification_date': 'modification_date',
+        'last_modified': 'last_modified',
         'elements': 'elements',
         'nelements': 'nelements',
         'chemical_formula': 'chemical_formula',
@@ -47,7 +47,7 @@ database_column_mapper = {
     'calculations': {
         'id': 'id',
         'local_id': 'local_id',
-        'modification_date': 'modification_date',
+        'last_modified': 'last_modified',
     }
 }
 
@@ -144,7 +144,7 @@ def close():
 
 def _setup_test_data():
     database.execute("drop table if exists structures")
-    database.execute("create table structures (id, local_id, modification_date, elements, nelements, chemical_formula, formula_prototype)")
+    database.execute("create table structures (id, local_id, last_modified, elements, nelements, chemical_formula, formula_prototype)")
 
     teststructs = get_test_structures()
 
@@ -154,7 +154,7 @@ def _setup_test_data():
 
         struct['id'] = teststruct.id
         struct['local_id'] = teststruct.id
-        struct['modification_date'] = teststruct.modification_date
+        struct['last_modified'] = teststruct.last_modified
         struct['nelements'] = teststruct.nelements
 
         segments = sorted(re.findall('[A-Z][a-z]?[0-9]*', teststruct.chemical_formula))
@@ -163,23 +163,23 @@ def _setup_test_data():
         struct['formula_prototype'] = teststruct.formula_prototype
         struct['elements'] = teststruct.elements
 
-        database.execute("insert into structures values (:id,:local_id,:modification_date,:elements,:nelements,:chemical_formula,:formula_prototype)", struct)
+        database.execute("insert into structures values (:id,:local_id,:last_modified,:elements,:nelements,:chemical_formula,:formula_prototype)", struct)
 
     database.execute("drop table if exists calculations")        
-    database.execute("create table calculations (id, local_id, modification_date)")
+    database.execute("create table calculations (id, local_id, last_modified)")
 
     calcs = [
-        {'id': 'calc-1', 'local_id': 'calc-1', 'modification_date': '2019-03-21 23:45'},
-        {'id': 'calc-2', 'local_id': 'calc-2', 'modification_date': '2019-03-22 23:45'},
-        {'id': 'calc-3', 'local_id': 'calc-3', 'modification_date': '2019-03-23 23:45'},
-        {'id': 'calc-4', 'local_id': 'calc-4', 'modification_date': '2019-03-24 23:45'},
-        {'id': 'calc-5', 'local_id': 'calc-5', 'modification_date': '2019-03-25 23:45'},
-        {'id': 'calc-6', 'local_id': 'calc-6', 'modification_date': '2019-03-26 23:45'},
-        {'id': 'calc-7', 'local_id': 'calc-7', 'modification_date': '2019-03-27 23:45'}
+        {'id': 'calc-1', 'local_id': 'calc-1', 'last_modified': '2019-03-21 23:45'},
+        {'id': 'calc-2', 'local_id': 'calc-2', 'last_modified': '2019-03-22 23:45'},
+        {'id': 'calc-3', 'local_id': 'calc-3', 'last_modified': '2019-03-23 23:45'},
+        {'id': 'calc-4', 'local_id': 'calc-4', 'last_modified': '2019-03-24 23:45'},
+        {'id': 'calc-5', 'local_id': 'calc-5', 'last_modified': '2019-03-25 23:45'},
+        {'id': 'calc-6', 'local_id': 'calc-6', 'last_modified': '2019-03-26 23:45'},
+        {'id': 'calc-7', 'local_id': 'calc-7', 'last_modified': '2019-03-27 23:45'}
     ]
 
     for calc in calcs:
-        database.execute("insert into calculations values (:id,:local_id,:modification_date)", calc)
+        database.execute("insert into calculations values (:id,:local_id,:last_modified)", calc)
 
     database.commit()
 

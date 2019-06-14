@@ -28,6 +28,21 @@ from __future__ import print_function
 
 import os, json, pprint, re, math, datetime
 
+def iso_8601_format(dt):
+    """YYYY-MM-DDThh:mm:ssTZD (1997-07-16T19:20:30-03:00)"""
+
+    if dt is None:
+        return ""
+
+    fmt_datetime = dt.strftime('%Y-%m-%dT%H:%M:%S')
+    tz = dt.utcoffset()
+    if tz is None:
+        fmt_timezone = "+00:00"
+    else:
+        fmt_timezone = str.format('{0:+06.2f}', float(tz.total_seconds() / 3600))
+
+    return fmt_datetime + fmt_timezone
+
 
 def int_to_anonymous_symbol(i):
     bigletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -40,7 +55,7 @@ def int_to_anonymous_symbol(i):
 
 
 class OptimadeStructure(object):
-    def __init__(self, id, lattice_vectors, cartesian_site_positions, species_at_sites, species, assemblies=None, chemical_formula=None, cifdata=None, cifheader=None, local_id=None, modification_date=None):
+    def __init__(self, id, lattice_vectors, cartesian_site_positions, species_at_sites, species, assemblies=None, chemical_formula=None, cifdata=None, cifheader=None, local_id=None, last_modified=None):
 
         self.id = id
         if local_id is not None:
@@ -77,10 +92,10 @@ class OptimadeStructure(object):
         prototype_formula_components = [int_to_anonymous_symbol(i)+prototype_formula_components[i][1] for i in range(len(prototype_formula_components))]
         self.formula_prototype = "".join(prototype_formula_components)
 
-        if modification_date is not None:
-            self.modification_date = modification_date
+        if last_modified is not None:
+            self.last_modified = last_modified
         else:
-            self.modification_date = datetime.datetime.now().isoformat()
+            self.last_modified = iso_8601_format(datetime.datetime.now())
 
     def __str__(self):
         return "<OptimadeStructure:"+self.id+" ("+self.chemical_formula+") >"
@@ -96,7 +111,7 @@ class OptimadeStructure(object):
             "chemical_formula="+repr(self.chemical_formula),
             "cifdata="+repr(self.cifdata),
             "local_id="+repr(self.local_id),
-            "modification_date="+repr(self.modification_date)])+")"
+            "last_modified="+repr(self.last_modified)])+")"
 
 
 json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'json')
