@@ -31,7 +31,7 @@ It runs code to validate the OPTIMaDe API on that URL.
 '''
 from __future__ import print_function
 
-import os, sys
+import os, sys, argparse
 from pprint import pprint
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'src'))
@@ -40,18 +40,21 @@ import validation
 
 if __name__ == "__main__":
 
-    if len(sys.argv)<2:
-        url = 'http://localhost:8080'
-    else:
-        url = sys.argv[1]
+    parser = argparse.ArgumentParser(description='Validate OPTiMaDe endpoint at url')
 
-    if len(sys.argv) >= 3:
-        tests = sys.argv[2:]
+    parser.add_argument('--backend', default=None)
+    parser.add_argument('url', nargs='?', default='http://localhost:8080')    
+    parser.add_argument('tests', nargs='*', default=[])
+
+    args = parser.parse_args()
+
+    if len(args.tests) > 0:
+        tests = args.tests
     else:
         tests = None
-        
-    result = validation.run(url, tests)
-    print("==== Validation results of:",url)
+
+    result = validation.run(args.url, tests, backend=args.backend)
+    print("==== Validation results of:",args.url)
     pprint(result)
     
     

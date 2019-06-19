@@ -27,38 +27,41 @@
 
 import os, json
 
-from openapi_core import create_spec
-from openapi_core.shortcuts import ResponseValidator
-from openapi_core.wrappers.mock import MockRequest, MockResponse
+from jsonschema import validate, ValidationError
 
 from .request import request, RequestError
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, "openapi.json")) as f:
-    spec_dict = json.load(f)
+with open(os.path.join(here, "openapi.new.json")) as f:
+    openapi_schema = json.load(f)
 
-spec = create_spec(spec_dict)
-validator = ResponseValidator(spec)
 
-def schema_validate(request, response):
-    result = validator.validate(request, response)
-    # raise errors if response invalid
-    result.raise_for_errors()
+def jsonschema_fetch_and_validate(base_url, test, init_result = None):
 
-    # get list of errors
-    errors = result.errors
+    if init_result is None:
+        result = {'error':[], 'warning':[], 'note':[]}
+    else:
+        result = init_result
+        
+    try:
+        output = request(base_url+test['relurl'])
+    except RequestError as e:
+        result['error'] += [{'description':str(e)}]
+        return result
+    
+    try:
+        #print "OUTPUT",output['response']
+        #print "ON",schema
+        schema = openapi_schema['paths'][test['relurl']][test['method'].lower()]['responses']['200']['content']['application/json']['schema']
+        schema['components'] = openapi_schema['components']
+        validate(output['response'], schema)
+    except ValidationError as e:
+        result['error'] += [{'description':str(e)}]
+    except KeyError as e:
+        result['error'] += [{'description':'missing schema parts:'+str(e)}]
+        
     return result
 
-def schema_validate_request(base_url, relurl):
-    try:
-        result = request(base_url+relurl)
 
-        openapi_request = MockRequest(host_url=base_url, method="GET", path=relurl)
-        openapi_response = MockResponse(data=result['raw_output'],status_code=result['code'])
-
-        print "RAW OUTPUT",result['raw_output']
-        
-        return schema_validate(openapi_request, openapi_response)
-    except RequestError as e:
-        return {'error':str(e), 'warning':[], 'note':[]}
+    
 

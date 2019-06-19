@@ -25,37 +25,49 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from .response import *
-from .base_info import *
-from .entry import *
-from .headers import *
-from .schema import schema_validate_request
+from .single_entry import prepare_single_entry
 
 all_tests = [
-    {'name':'base_info_schema', 'relurl':'/structures', 'test':schema_validate_request, 'validation':None},    
-    {'name':'base_info', 'relurl':'/info', 'test':validate_base_info_request, 'validation':validate_base_info},
+    {'name':'base_info', 'relurl':'/structures', "method":'GET'},
+    {'name':'base_info', 'relurl':'/info', "method":'GET'},
+    {'name':'structures', 'relurl':'/structures', "method":'GET'},
+    {'name':'structures_info', 'relurl':'/structures/info', "method":'GET'},
+    {'name':'calculations', 'relurl':'/calculations', "method":'GET'},
+    {'name':'calculations_info', 'relurl':'/calculations/info', "method":'GET'},
 
-    {'name':'headers', 'relurl':'/info', 'test':validate_headers, 'validation':None},    
-    
-    {'name':'structures', 'relurl':'/all', 'test':validate_response_request, 'validation':validate_response},
-    {'name':'structures', 'relurl':'/structures', 'test':validate_response_request, 'validation':validate_response},
-    {'name':'structures_info', 'relurl':'/structures/info', 'test':validate_response_request, 'validation':validate_response},
-    {'name':'calculations', 'relurl':'/calculations', 'test':validate_response_request, 'validation':validate_response},
-    {'name':'calculations_info', 'relurl':'/calculations/info', 'test':validate_response_request, 'validation':validate_response},
-
-    {'name':'structures_single_entry', 'relurl':'/structures', 'test':validate_single_entry_request, 'validation':validate_response},
-    {'name':'calculations_single_entry', 'relurl':'/calculations', 'test':validate_single_entry_request, 'validation':validate_response},
-    
+    {'name':'structures_single_entry', 'relurl':'/structures', 'prepare':prepare_single_entry, "method":'GET'},
+    {'name':'calculations_single_entry', 'relurl':'/calculations', 'prepare':prepare_single_entry, "method":'GET'},
 ]
 
-def run(base_url, tests = None):
+def run(base_url, tests = None, backend=None):
+
+    if backend is None:
+        backend = "openapi_core"
+
+    if backend == "jsonschema":
+        from .jsonschema_validator import jsonschema_fetch_and_validate as fetch_and_validate
+        
+    elif backend == "openapi_core":
+        from .openapi_core_validator import openapi_core_fetch_and_validate as fetch_and_validate
+
+    elif backend == "adhoc":
+        from .adhoc_validator import adhoc_fetch_and_validate as fetch_and_validate
+
+    else:
+        raise Ecception("Unknown backend:"+str(backend))
     
+        
     results = {}
     
     for test in all_tests:
-        if tests == None or test['name'] in tests:
-            results[test['name']] = test['test'](base_url, test['relurl'])
+        if tests is None or test['name'] in tests:
+            if 'prepare' in test:
+                init_result = test['prepare'](base_url, dict(test))
+            else:
+                init_result = None
+            if 'stop' not in test or not test['stop']:
+                results[test["name"]] = fetch_and_validate(base_url, test,init_result=init_result)
+                
         
     return results
 
