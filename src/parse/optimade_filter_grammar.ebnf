@@ -7,14 +7,14 @@ Filter = [Spaces], Expression ;
 
 Constant = String | Number ;
 
-Value = String | Number | Identifier ;
-(* Note: support for Identifier in Value is OPTIONAL *)
+Value = String | Number | Property ;
+(* Note: support for Property in Value is OPTIONAL *)
 
 ValueList = [ Operator ], Value, { Comma, [ Operator ], Value } ;
 (* Support for Operator in ValueList is OPTIONAL *)
 
-ValueZip = [ Operator ], Value, Colon, [ Operator ], Value, {Colon, [ Operator ], Value} ;
-(* Support for the optional Operator in ValueZip is OPTIONAL *)
+ValueZip = [ Operator ], Value, Colon, [ Operator ], Value, {Colon, [ Operator ], Value } ;
+(* Support for Operator in ValueZip is OPTIONAL *)
 
 ValueZipList = ValueZip, { Comma, ValueZip } ;
 
@@ -24,39 +24,44 @@ Expression = ExpressionClause, [ OR, Expression ] ;
 
 ExpressionClause = ExpressionPhrase, [ AND, ExpressionClause ] ;
 
-ExpressionPhrase = [ NOT ], ( Comparison | PredicateComparison | OpeningBrace, Expression, ClosingBrace );
+ExpressionPhrase = [ NOT ], ( Comparison | OpeningBrace, Expression, ClosingBrace ) ;
 
-Comparison = ConstantFirstComparison |
-             IdentifierFirstComparison ;
+Comparison = ConstantFirstComparison
+           | PropertyFirstComparison ;
 (* Note: support for ConstantFirstComparison is OPTIONAL *)
 
-IdentifierFirstComparison = Identifier, ( 
-                ValueOpRhs |
-                KnownOpRhs |
-                FuzzyStringOpRhs |
-                SetOpRhs | 
-                SetZipOpRhs );
-(* Note: support for SetZipOpRhs in Comparison is OPTIONAL *)
-
 ConstantFirstComparison = Constant, ValueOpRhs ;
-				
-PredicateComparison = LengthComparison ;
+
+PropertyFirstComparison = Property, ( ValueOpRhs
+                                    | KnownOpRhs
+                                    | FuzzyStringOpRhs
+                                    | SetOpRhs
+                                    | SetZipOpRhs
+                                    | LengthOpRhs ) ;
+(* Note: support for SetZipOpRhs in Comparison is OPTIONAL *)
 
 ValueOpRhs = Operator, Value ;
 
-KnownOpRhs = IS, ( KNOWN | UNKNOWN ) ; 
+KnownOpRhs = IS, ( KNOWN | UNKNOWN ) ;
 
-FuzzyStringOpRhs = CONTAINS, String | STARTS, [ WITH ], String | ENDS, [ WITH ], String ;
+FuzzyStringOpRhs = CONTAINS, Value
+                 | STARTS, [ WITH ], Value
+                 | ENDS, [ WITH ], Value ;
 
-SetOpRhs = HAS, ( [ Operator ], Value | ALL, ValueList | EXACTLY, ValueList | ANY, ValueList | ONLY, ValueList ) ;
+SetOpRhs = HAS, ( [ Operator ], Value | ALL, ValueList | ANY, ValueList | ONLY, ValueList ) ;
 (* Note: support for ONLY in SetOpRhs is OPTIONAL *)
 (* Note: support for [ Operator ] in SetOpRhs is OPTIONAL *)
 
-SetZipOpRhs = IdentifierZipAddon, HAS, ( ValueZip | ONLY, ValueZipList | ALL, ValueZipList | EXACTLY, ValueZipList | ANY, ValueZipList ) ;
+SetZipOpRhs = PropertyZipAddon, HAS, ( ValueZip | ONLY, ValueZipList | ALL, ValueZipList | ANY, ValueZipList ) ;
 
-LengthComparison = LENGTH, Identifier, Operator, Value ;
+PropertyZipAddon = Colon, Property, { Colon, Property } ;
 
-IdentifierZipAddon = Colon, Identifier, {Colon, Identifier} ;
+LengthOpRhs = LENGTH, [ Operator ], Value ;
+(* Note: support for [ Operator ] in LengthOpRhs is OPTIONAL *)
+
+(* Property *)
+
+Property = Identifier, { Dot, Identifier } ;
 
 (* TOKENS *)
 
@@ -65,52 +70,48 @@ IdentifierZipAddon = Colon, Identifier, {Colon, Identifier} ;
 OpeningBrace = '(', [Spaces] ;
 ClosingBrace = ')', [Spaces] ;
 
+Dot = '.', [Spaces] ;
 Comma = ',', [Spaces] ;
 Colon = ':', [Spaces] ;
 
 (* Boolean relations: *)
 
-AND = 'A', 'N', 'D', [Spaces] ;
-NOT = 'N', 'O', 'T', [Spaces] ;
-OR = 'O', 'R', [Spaces] ;
+AND = 'AND', [Spaces] ;
+NOT = 'NOT', [Spaces] ;
+OR = 'OR', [Spaces] ;
 
-IS = 'I', 'S', [Spaces] ;
-KNOWN = 'K', 'N', 'O', 'W', 'N', [Spaces] ;
-UNKNOWN = 'U', 'N', 'K', 'N', 'O', 'W', 'N', [Spaces] ;
+IS = 'IS', [Spaces] ;
+KNOWN = 'KNOWN', [Spaces] ;
+UNKNOWN = 'UNKNOWN', [Spaces] ;
 
-CONTAINS = 'C', 'O', 'N', 'T', 'A', 'I', 'N', 'S', [Spaces] ;
-STARTS = 'S', 'T', 'A', 'R', 'T', 'S', [Spaces] ;
-ENDS = 'E', 'N', 'D', 'S', [Spaces] ;
-WITH = 'W', 'I', 'T', 'H', [Spaces] ;
+CONTAINS = 'CONTAINS', [Spaces] ;
+STARTS = 'STARTS', [Spaces] ;
+ENDS = 'ENDS', [Spaces] ;
+WITH = 'WITH', [Spaces] ;
 
-LENGTH = 'L', 'E', 'N', 'G', 'T', 'H', [Spaces] ;
-HAS = 'H', 'A', 'S', [Spaces] ;
-ALL = 'A', 'L', 'L', [Spaces] ;
-ONLY = 'O', 'N', 'L', 'Y', [Spaces] ;
-EXACTLY = 'E', 'X', 'A', 'C', 'T', 'L', 'Y', [Spaces] ;
-ANY = 'A', 'N', 'Y', [Spaces] ;
+LENGTH = 'LENGTH', [Spaces] ;
+HAS = 'HAS', [Spaces] ;
+ALL = 'ALL', [Spaces] ;
+ONLY = 'ONLY', [Spaces] ;
+ANY = 'ANY', [Spaces] ;
 
-(* OperatorComparison operator tokens: *)
+(* Comparison operator tokens: *)
 
-Operator = ( '<', [ '=' ] | '>', [ '=' ] | '=' | '!', '=' ), [Spaces] ;
+Operator = ( '<', [ '=' ] | '>', [ '=' ] | [ '!' ], '=' ), [Spaces] ;
 
-(* Identifier syntax *)
+(* Property syntax *)
 
 Identifier = LowercaseLetter, { LowercaseLetter | Digit }, [Spaces] ;
 
 Letter = UppercaseLetter | LowercaseLetter ;
 
-UppercaseLetter =
-    'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' |
-    'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' |
-    'Y' | 'Z'
-;
+UppercaseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I'
+                | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R'
+                | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' ;
 
-LowercaseLetter =
-    'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 
-    'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' |
-    'y' | 'z' | '_'
-;
+LowercaseLetter = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i'
+                | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r'
+                | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | '_' ;
 
 (* Strings: *)
 
@@ -120,17 +121,10 @@ EscapedChar = UnescapedChar | '\', '"' | '\', '\' ;
 
 UnescapedChar = Letter | Digit | Space | Punctuator | UnicodeHighChar ;
 
-Punctuator =
-    '!' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+' | ',' |
-    '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '?' | '@' | '[' |
-    ']' | '^' | '`' | '{' | '|' | '}' | '~'
-;
+Punctuator = '!' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+'
+           | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '?'
+           | '@' | '[' | ']' | '^' | '`' | '{' | '|' | '}' | '~' ;
 
-(* The 'UnicodeHighChar' specifies all Unicode characters above 0x7F;
-   the syntax used is the onw compatible with Grammatica: *)
-
-UnicodeHighChar = ? [^\x00-\xFF] ? ;
- 
 (* BEGIN EBNF GRAMMAR Number *)
 (* Number token syntax: *)
 
@@ -148,9 +142,23 @@ Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
 
 (* White-space: *)
 
-Space = ' ' | '\t' ;
+(* Special character tokens: *)
+
+tab = ? \t ?;
+nl  = ? \n ?;
+cr  = ? \r ?;
+vt  = ? \v ?;
+ff  = ? \f ?;
+
+Space = ' ' | tab | nl | cr | vt | ff ;
 
 Spaces = Space, { Space } ;
+
+(* The 'UnicodeHighChar' specifies any Unicode character above 0x7F.
+   It is specified in this grammar by an extension to EBNF that allows a
+   regular expression to specify terminal symbol ranges. *)
+
+UnicodeHighChar = ? [^\x00-\x7F] ? ;
 
 (* END EBNF GRAMMAR Number *)
 (* END EBNF GRAMMAR Filter *)

@@ -70,6 +70,7 @@ def initialize_optimade_parser():
         "Number": r"[-+]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][-+]?[0-9]+)?",
         "OpeningBrace": r"\(",
         "ClosingBrace": r"\)",
+        "Dot": r"\.",
         "Colon": r":",
         "Comma": r","
     }
